@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <_x64OrBlank>_x64</_x64OrBlank>
+    <_64OrBlank>64</_64OrBlank>
+    <BitDepth>64</BitDepth>
+  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(MSBuildThisFileDirectory)HrgTools.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.23107.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="_x64OrBlank">
+      <Value>$(_x64OrBlank)</Value>
+    </BuildMacro>
+    <BuildMacro Include="_64OrBlank">
+      <Value>$(_64OrBlank)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BitDepth">
+      <Value>$(BitDepth)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
