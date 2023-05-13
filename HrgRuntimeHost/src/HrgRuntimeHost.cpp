@@ -45,6 +45,12 @@ enum  optionIndex {
 	VARIATION,
 	DENOMINATION,
 	LOGPATH,
+	// Below are normal from Monaco but unused here
+	DISPLAY0, DISPLAY1, DISPLAY2, DISPLAY3,
+	IPC_PLUGIN,
+	JURISDICTION,
+	FPSLIMIT,
+	CDSPLUGINS,
 };
 
 using namespace aristocrat;
@@ -57,6 +63,14 @@ const option::Descriptor usage[] =
 	{ VARIATION,	"v", "variation", option::Arg::String,  "  --variation, -v \tset Game Variation." },
 	{ DENOMINATION, "de", "denomination", option::Arg::Numeric, "--denomination, -de \tdenomination"},
 	{ LOGPATH,		"lg", "log", option::Arg::String,		"  --log, -lg \tset the logging path (relative to game or absolute)." },
+	{ DISPLAY0,		"d0", "display0", option::Arg::Numeric,	"  --display0, -d0 \tset Window Display 0 handle (unused)." },
+	{ DISPLAY1,		"d1", "display1", option::Arg::Numeric, "  --display1, -d1 \tset Window Display 1 handle (unused)." },
+	{ DISPLAY2,		"d2", "display2", option::Arg::Numeric, "  --display2, -d2 \tset Window Display 2 handle (unused)." },
+	{ DISPLAY3,		"d3", "display3", option::Arg::Numeric, "  --display3, -d3 \tset Window Display 3 handle (unused)." },
+	{ IPC_PLUGIN,	"w", "wcf", option::Arg::None,			"  --wcf, -w \tEnable Snapp Plugin (built into host).  We have to keep this command line option because we can't make new command line option requirements of the Platform (for backward compatibility). (unused)" },
+	{ JURISDICTION,	"j", "jurisdiction", option::Arg::String,		"  --jurisdiction, -j \tset the jurisdiction preset configuration. (unused)" },
+	{ FPSLIMIT,		"f", "fps", option::Arg::Numeric,		"  --fps, -f \toverride fps limit (0 = unlimited). (unused)" },
+	{ CDSPLUGINS,	"cds", "cds", option::Arg::None,  " --cds  \tauto load required plugins for CDS games (unused)"},
 	{ UNKNOWN,  "", "", option::Arg::None,					"\nExamples:\n"
 	"  example -g ../Games/TemplateGame/TemplateGame.dll\n"
 	"  example \n" },
