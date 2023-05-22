@@ -28,7 +28,7 @@
 FILE* LogCallback::_hFileHandle = NULL;
 const char* LogCallback::_logFileName = "Runtime.log";
 CRITICAL_SECTION LogCallback::_hSection = { 0 };
-int LogCallback::_logLevel = LogLevel::DefaultLogLevel;
+int LogCallback::_logLevel = DefaultLogLevel;
 bool LogCallback::_initialized = false;
 const char* APPLICATION_NAME = "HrgRuntimeHost";
 const char* CONFIG = "Config";
@@ -39,7 +39,7 @@ HANDLE _hRunOnceMutex = NULL;
 
 static char __log_folder[MAX_PATH] = { 0 };
 
-enum  optionIndex {
+enum optionIndex {
 	UNKNOWN, 
 	GAMEMODULE,
 	VARIATION,
@@ -57,7 +57,7 @@ using namespace aristocrat;
 
 const option::Descriptor usage[] =
 {
-	{ UNKNOWN,  "", "", option::Arg::None, "USAGE: example [options]\n\n"
+	{ optionIndex::UNKNOWN,  "", "", option::Arg::None, "USAGE: example [options]\n\n"
 	"Options:" },
 	{ GAMEMODULE,	"g", "game", option::Arg::String /*| option::Arg::Required */, "  --game, -g \tgame module to load." },
 	{ VARIATION,	"v", "variation", option::Arg::String,  "  --variation, -v \tset Game Variation." },
@@ -71,7 +71,7 @@ const option::Descriptor usage[] =
 	{ JURISDICTION,	"j", "jurisdiction", option::Arg::String,		"  --jurisdiction, -j \tset the jurisdiction preset configuration. (unused)" },
 	{ FPSLIMIT,		"f", "fps", option::Arg::Numeric,		"  --fps, -f \toverride fps limit (0 = unlimited). (unused)" },
 	{ CDSPLUGINS,	"cds", "cds", option::Arg::None,  " --cds  \tauto load required plugins for CDS games (unused)"},
-	{ UNKNOWN,  "", "", option::Arg::None,					"\nExamples:\n"
+	{ optionIndex::UNKNOWN,  "", "", option::Arg::None,					"\nExamples:\n"
 	"  example -g ../Games/TemplateGame/TemplateGame.dll\n"
 	"  example \n" },
 	{ 0, 0, 0, option::Arg::None, 0 }
@@ -169,13 +169,14 @@ int MemoryCheckedMain(HINSTANCE hInstance, option::Options& opts)
 	}
 	else
 	{
-		LogCallback::SLogFormat(__log_folder, LogLevel::LogError, "Init", "Game module path is Null.");
+		LogCallback::SLogFormat(__log_folder, LogError, "Init", "Game module path is Null.");
 		return 1;
 	}
 
     {
-		Runtime* pRuntime = new Runtime();
-		CommPlugin* pPlugins = new CommPlugin();
+		auto logger = new LogCallback(DefaultLogLevel, __log_folder);
+		Runtime* pRuntime = new Runtime(logger);
+		CommPlugin* pPlugins = new CommPlugin(logger);
 
 		// pass information to GDKRuntime
 		if (!gameVariation.empty())

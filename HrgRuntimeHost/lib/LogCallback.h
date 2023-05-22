@@ -103,13 +103,13 @@ public:
 		const char* context_source, const char* message)
 	{
 
-		int target_loglevel = (log_level & LogLevel::LevelMask);
-		int loglevel = (_logLevel & LogLevel::LevelMask);
+		int target_loglevel = (log_level & LevelMask);
+		int loglevel = (_logLevel & LevelMask);
 
 		if (loglevel > target_loglevel)
 			return;
 
-		int log_source = log_level & LogLevel::SourceMask;
+		int log_source = log_level & SourceMask;
 
 		if (log_source != 0)
 		{

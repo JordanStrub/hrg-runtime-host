@@ -1,36 +1,18 @@
 #pragma once
+
+#include "LogCallback.h"
+
 class Runtime
 {
+    LogCallback* _pLog;
     bool _pendingShutdown;
 
 public:
-    bool SetParameter(const char*, const char*, const char*)
-    {
-        return true;
-    }
-
-    bool LoadFromModule(const char* psGameModule)
-    {
-        return true;
-    }
-
-    bool Configure()
-    {
-        return true;
-    }
-
-    bool Initialize()
-    {
-        return true;
-    }
-
-    void Shutdown()
-    {
-        _pendingShutdown = true;
-    }
-
-    bool IsPendingShutdown()
-    {
-        return _pendingShutdown;
-    }
+    Runtime(LogCallback* pLogCallback);
+    bool SetParameter(const char*, const char*, const char*);
+    bool LoadFromModule(const char* psGameModule);
+    bool Configure();
+    bool Initialize();
+    void Shutdown();
+    bool IsPendingShutdown();
 };

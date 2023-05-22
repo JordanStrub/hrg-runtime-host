@@ -62,5 +62,14 @@
     <ClInclude Include="src\CommPlugin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\RuntimeReelServiceCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RuntimePresentationServiceCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RuntimeServiceCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

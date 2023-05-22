@@ -61,11 +61,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals\google-protobuf\include;$(SolutionDir)Externals\Aristocrat.GdkRuntime.SnappCpp\include;$(SolutionDir)Externals\Aristocrat.SnappCpp\include;$(ProjectDir)\lib</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Externals\Aristocrat.GdkRuntime.SnappCpp\lib;$(SolutionDir)Externals\Aristocrat.SnappCpp\lib;$(SolutionDir)Externals\google-protobuf\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Aristocrat.GdkRuntime.SnappCpp.lib;Aristocrat.SnappCpp.lib;libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -76,13 +79,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals\google-protobuf\include$(SolutionDir)Externals\Aristocrat.GdkRuntime.SnappCpp\include;$(SolutionDir)Externals\Aristocrat.SnappCpp\include;$(ProjectDir)\lib</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Externals\Aristocrat.GdkRuntime.SnappCpp\lib;$(SolutionDir)Externals\Aristocrat.SnappCpp\lib;$(SolutionDir)Externals\google-protobuf\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Aristocrat.GdkRuntime.SnappCpp.lib;Aristocrat.SnappCpp.lib;libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -102,6 +108,9 @@
     <ClInclude Include="lib\winutil.h" />
     <ClInclude Include="src\CommPlugin.h" />
     <ClInclude Include="src\Runtime.h" />
+    <ClInclude Include="src\RuntimeReelServiceCallback.h" />
+    <ClInclude Include="src\RuntimePresentationServiceCallback.h" />
+    <ClInclude Include="src\RuntimeServiceCallback.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
