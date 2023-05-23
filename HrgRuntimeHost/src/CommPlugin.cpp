@@ -1,11 +1,6 @@
 #include "CommPlugin.h"
-#include "RuntimeServiceCallback.h"
-#include "RuntimeReelServiceCallback.h"
-#include "RuntimePresentationServiceCallback.h"
 #include "Server.h"
 #include "Logger.h"
-#include "NamedPipeServerTransport.h"
-#include "NamedPipeClientTransport.h"
 
 using namespace Aristocrat::Snapp;
 
@@ -34,35 +29,85 @@ static void StaticLog(int level, std::string message)
 }
 
 CommPlugin::CommPlugin(LogCallback* pLogCallback)
-    : _server(nullptr)
 {
     commPlugin = this;
     pLog = pLogCallback;
     SetExternalLogger(StaticLog);
+
+
+    //// Platform-side Client
+    // _pClientTransport = new NamedPipeClientTransport(MonacoClientPipeName);
+    //_pClientChannel = new Channel(_pClientTransport);
+
+    //_pGameCallbacks = new GameCallbacks(pLog, _pClientChannel);
+    //_pReelCallbacks = new ReelCallbacks(_pGameCallbacks, pLog, _pClientChannel);
+    //_pPresentationCallbacks = new PresentationCallbacks(_pGameCallbacks, pLog, _pClientChannel);
+
+
+    // Platform-side Server
+    _pServiceCallbacks = new ServiceCallbacks();
+    _pRuntimeServiceCallbacks = new RuntimeServiceCallback(pLog);
+    _pRuntimeReelServiceCallbacks = new RuntimeReelServiceCallback(pLog);
+    _pRuntimePresentationServiceCallbacks = new RuntimePresentationServiceCallback(pLog);
+    _pServiceCallbacks->AddCallback(*_pRuntimeServiceCallbacks);
+    _pServiceCallbacks->AddCallback(*_pRuntimeReelServiceCallbacks);
+    _pServiceCallbacks->AddCallback(*_pRuntimePresentationServiceCallbacks);
+
+    _pServerTransport = new NamedPipeServerTransport(MonacoServerPipeName);
+    _pPlatformServer = new Server(_pServerTransport, _pServiceCallbacks);
+    _pPlatformServer->Start();
+    pLog->Log(LogInfo, "CommPlugin", "Started server comms");
+
+
+    // Platform-side Client
+    _pClientTransport = new NamedPipeClientTransport(MonacoClientPipeName);
+    _pClientChannel = new Channel(_pClientTransport);
+
+    _pGameCallbacks = new GameCallbacks(pLog, _pClientChannel);
+    _pReelCallbacks = new ReelCallbacks(_pGameCallbacks, pLog, _pClientChannel);
+    _pPresentationCallbacks = new PresentationCallbacks(_pGameCallbacks, pLog, _pClientChannel);
+    pLog->Log(LogInfo, "CommPlugin", "Started client comms");
+
+
+    // Game-side Client
+
+    // Game-side Server
+
 }
+
+CommPlugin::~CommPlugin()
+{
+    delete _pPresentationCallbacks;
+    delete _pReelCallbacks;
+    delete _pGameCallbacks;
+    delete _pClientChannel;
+    delete _pClientTransport;
+
+    _pPlatformServer->Stop();
+    delete _pPlatformServer;
+    delete _pServerTransport;
+    delete _pRuntimePresentationServiceCallbacks;
+    delete _pRuntimeReelServiceCallbacks;
+    delete _pRuntimeServiceCallbacks;
+    delete _pServiceCallbacks;
+}
+
 
 void CommPlugin::Start()
 {
-
-    ServiceCallbacks callbacks;
-    RuntimeServiceCallback runtimeCallback(pLog);
-    RuntimeReelServiceCallback runtimeReelCallback(pLog);
-    RuntimePresentationServiceCallback runtimePresentationCallback(pLog);
-    callbacks.AddCallback(runtimeCallback);
-    callbacks.AddCallback(runtimeReelCallback);
-    callbacks.AddCallback(runtimePresentationCallback);
-
-    NamedPipeServerTransport serverTransport(MonacoServerPipeName);
-    _server = new Server(&serverTransport, &callbacks);
-    _server->Start();
-    pLog->Log(LogInfo, "CommPlugin", "Starting comms");
-
-
+    //::Sleep(250);
+    //JoinRequest join;
+    //Empty empty;
+    //Status status;
+    //_pGameCallbacks->Join(join, empty, status);
 }
 
 void CommPlugin::Stop()
 {
-    
+    LeaveRequest leave;
+    Empty empty;
+    Status status;
+    _pGameCallbacks->Leave(leave, empty, status);
 }
 
 void CommPlugin::Update(double elapsedTime)

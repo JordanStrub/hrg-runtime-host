@@ -107,6 +107,9 @@
     <ClInclude Include="lib\timer.h" />
     <ClInclude Include="lib\winutil.h" />
     <ClInclude Include="src\CommPlugin.h" />
+    <ClInclude Include="src\GameCallbacks.h" />
+    <ClInclude Include="src\PresentationCallbacks.h" />
+    <ClInclude Include="src\ReelCallbacks.h" />
     <ClInclude Include="src\Runtime.h" />
     <ClInclude Include="src\RuntimeReelServiceCallback.h" />
     <ClInclude Include="src\RuntimePresentationServiceCallback.h" />

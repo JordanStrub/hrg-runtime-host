@@ -71,5 +71,14 @@
     <ClInclude Include="src\RuntimeServiceCallback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\GameCallbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PresentationCallbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ReelCallbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -176,7 +176,7 @@ int MemoryCheckedMain(HINSTANCE hInstance, option::Options& opts)
     {
 		auto logger = new LogCallback(DefaultLogLevel, __log_folder);
 		Runtime* pRuntime = new Runtime(logger);
-		CommPlugin* pPlugins = new CommPlugin(logger);
+		CommPlugin* pCommPlugin = new CommPlugin(logger);
 
 		// pass information to GDKRuntime
 		if (!gameVariation.empty())
@@ -196,8 +196,8 @@ int MemoryCheckedMain(HINSTANCE hInstance, option::Options& opts)
 
 		LogCallback::SLog(__log_folder, LogInfo, "Init", "Configured Runtime");
 
-		pPlugins->Start();
-		LogCallback::SLog(__log_folder, LogInfo, "Init", "Started SNAPP host.");
+		//pCommPlugin->Start();
+		//LogCallback::SLog(__log_folder, LogInfo, "Init", "Started SNAPP host.");
 
 		LogCallback::SLogFormat(__log_folder, LogInfo, "Init", "Loading Game Module %s.", gameModulePath);
 		/* try and load a game module from path provided */
@@ -209,6 +209,9 @@ int MemoryCheckedMain(HINSTANCE hInstance, option::Options& opts)
 			/* Pre-loading configurations */
 			pRuntime->Configure();
 			LogCallback::SLog(__log_folder, LogInfo, "Init", "Runtime Configuration Complete.");
+
+			pCommPlugin->Start();
+			LogCallback::SLog(__log_folder, LogInfo, "Init", "Started SNAPP host.");
 
 			if (pRuntime->Initialize())/* Initializes game (will create instance of client and server) */
 			{
@@ -226,7 +229,7 @@ int MemoryCheckedMain(HINSTANCE hInstance, option::Options& opts)
 
 						try
 						{
-								pPlugins->Update(elapsedTime);
+								pCommPlugin->Update(elapsedTime);
 						}
 						catch (std::exception& e)
 						{
