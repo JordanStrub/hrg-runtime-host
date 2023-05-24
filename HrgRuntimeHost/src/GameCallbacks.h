@@ -51,8 +51,17 @@ public:
 
     void Join(JoinRequest& request, Empty& response, Status& status)
     {
+        char buf[1000];
+        sprintf(buf, "Join: is-comm-open? %d", is_communication_open());
+        Log(LogInfo, buf);
+        sprintf(buf, "Join: connected? %d", IsConnected());
+        Log(LogInfo, buf);
+
         Log(LogInfo, "Join");
         _stub->Join(request, response, status);
+
+        sprintf(buf, "Join: status = %d %s", status.status_code(), status.error_description().c_str());
+        Log(LogInfo, buf);
     }
 
     void Leave(LeaveRequest& request, Empty& response, Status& status)

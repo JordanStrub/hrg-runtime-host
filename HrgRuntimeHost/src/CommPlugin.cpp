@@ -34,16 +34,6 @@ CommPlugin::CommPlugin(LogCallback* pLogCallback)
     pLog = pLogCallback;
     SetExternalLogger(StaticLog);
 
-
-    //// Platform-side Client
-    // _pClientTransport = new NamedPipeClientTransport(MonacoClientPipeName);
-    //_pClientChannel = new Channel(_pClientTransport);
-
-    //_pGameCallbacks = new GameCallbacks(pLog, _pClientChannel);
-    //_pReelCallbacks = new ReelCallbacks(_pGameCallbacks, pLog, _pClientChannel);
-    //_pPresentationCallbacks = new PresentationCallbacks(_pGameCallbacks, pLog, _pClientChannel);
-
-
     // Platform-side Server
     _pServiceCallbacks = new ServiceCallbacks();
     _pRuntimeServiceCallbacks = new RuntimeServiceCallback(pLog);
@@ -66,6 +56,8 @@ CommPlugin::CommPlugin(LogCallback* pLogCallback)
     _pGameCallbacks = new GameCallbacks(pLog, _pClientChannel);
     _pReelCallbacks = new ReelCallbacks(_pGameCallbacks, pLog, _pClientChannel);
     _pPresentationCallbacks = new PresentationCallbacks(_pGameCallbacks, pLog, _pClientChannel);
+
+    _pClientChannel->Connect();
     pLog->Log(LogInfo, "CommPlugin", "Started client comms");
 
 
@@ -95,11 +87,11 @@ CommPlugin::~CommPlugin()
 
 void CommPlugin::Start()
 {
-    //::Sleep(250);
-    //JoinRequest join;
-    //Empty empty;
-    //Status status;
-    //_pGameCallbacks->Join(join, empty, status);
+    ::Sleep(250);
+    JoinRequest join;
+    Empty empty;
+    Status status;
+    _pGameCallbacks->Join(join, empty, status);
 }
 
 void CommPlugin::Stop()
