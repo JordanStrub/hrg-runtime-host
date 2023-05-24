@@ -92,6 +92,11 @@ void CommPlugin::Start()
     Empty empty;
     Status status;
     _pGameCallbacks->Join(join, empty, status);
+
+    ::Sleep(250);
+    RuntimeEventNotification notify;
+    notify.set_runtimeevent(RuntimeEventNotification_RuntimeEvent_RequestConfiguration);
+    _pGameCallbacks->RuntimeEvent(notify, empty, status);
 }
 
 void CommPlugin::Stop()

@@ -15,7 +15,18 @@ public:
     virtual StatusCode UpdateState(UpdateStateRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateState"); return OK; };
     virtual StatusCode GetFlag(GetFlagRequest& request, GetFlagResponse& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called GetFlag"); return OK; };
     virtual StatusCode UpdateFlag(UpdateFlagRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateFlag"); return OK; };
-    virtual StatusCode UpdateParameters(UpdateParametersRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateParameters"); return OK; };
+    virtual StatusCode UpdateParameters(UpdateParametersRequest& request, Empty& response, Status& status)
+    {
+        _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateParameters");
+        char buf[1000];
+        auto map = request.parameters();
+        for (auto iter = map.begin(); iter != map.end(); iter++)
+        {
+            sprintf(buf, "parameter %s = %s", iter->first.c_str(), iter->second.c_str());
+            _pLog->Log(LogInfo, "RuntimeServiceCallback", buf);
+        }
+        return OK;
+    };
     virtual StatusCode UpdateLocalTimeTranslationBias(UpdateLocalTimeTranslationBiasRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateLocalTimeTranslationBias"); return OK; };
     virtual StatusCode UpdateButtonState(UpdateButtonStateRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateButtonState"); return OK; };
     virtual StatusCode UpdateBalance(UpdateBalanceNotification& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateBalance"); return OK; };
