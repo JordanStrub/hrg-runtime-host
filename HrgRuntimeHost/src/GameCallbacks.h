@@ -111,7 +111,7 @@ public:
         }
     }
 
-    void RuntimeStateChange(RuntimeStateNotification& request, Empty& response, Status& status)
+    void RuntimeStateChange(RuntimeStateNotication& request, Empty& response, Status& status)
     {
         if (is_communication_open())
         {
@@ -129,7 +129,7 @@ public:
         }
     }
 
-    void ButtonStatesChanged(ButtonStatesChangedNotification& request, Empty& response, Status& status)
+    void ButtonStatesChanged(ButtonStatesChangedNotfication& request, Empty& response, Status& status)
     {
         if (is_communication_open())
         {

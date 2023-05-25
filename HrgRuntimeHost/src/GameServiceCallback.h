@@ -17,9 +17,9 @@ public:
     virtual StatusCode RuntimeEvent(RuntimeEventNotification& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback", "Called RuntimeEvent"); return OK; }
     virtual StatusCode RuntimeFlagChange(RuntimeFlagNotification& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback", "Called RuntimeFlagChange"); return OK; }
     virtual StatusCode RuntimeRequest(RuntimeRequestNotification& request, RuntimeRequestResponse& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback", "Called RuntimeRequest"); return OK; }
-    virtual StatusCode RuntimeStateChange(RuntimeStateNotification& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback", "Called RuntimeStateChange"); return OK; }
+    virtual StatusCode RuntimeStateChange(RuntimeStateNotication& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback", "Called RuntimeStateChange"); return OK; }
     virtual StatusCode ButtonDeckImageChanged(Empty& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback", "Called ButtonDeckImageChanged"); return OK; }
-    virtual StatusCode ButtonStatesChanged(ButtonStatesChangedNotification& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback", "Called ButtonStatesChanged"); return OK; }
+    virtual StatusCode ButtonStatesChanged(ButtonStatesChangedNotfication& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback", "Called ButtonStatesChanged"); return OK; }
     virtual StatusCode BeginGameRound(BeginGameRoundRequest& request, BeginGameRoundResponse& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback", "Called BeginGameRound"); return OK; }
     virtual StatusCode BeginGameRoundAsync(BeginGameRoundAsyncRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback", "Called BeginGameRoundAsync"); return OK; }
     virtual StatusCode BeginGameRoundResult(BeginGameRoundResultNotification& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback", "Called BeginGameRoundResult"); return OK; }
