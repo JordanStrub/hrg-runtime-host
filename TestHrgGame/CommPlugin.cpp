@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "CommPlugin.h"
 #include "Server.h"
 #include "Logger.h"
@@ -7,8 +8,8 @@ using namespace Aristocrat::Snapp;
 static LogCallback* pLog = nullptr;
 static CommPlugin* commPlugin = nullptr;
 
-const wchar_t* MonacoServerPipeName = L"MonacoRuntimeSnapp";
-const wchar_t* MonacoClientPipeName = L"MonacoPlatformSnapp";
+const wchar_t* HostServerPipeName = L"HostRuntimeSnapp";
+const wchar_t* HostClientPipeName = L"HostPlatformSnapp";
 
 static void StaticLog(int level, std::string message)
 {
@@ -41,52 +42,41 @@ CommPlugin::CommPlugin(LogCallback* pLogCallback)
     _pServiceCallbacks->AddCallback(*_pRuntimeServiceCallbacks);
     _pServiceCallbacks->AddCallback(*_pRuntimePresentationServiceCallbacks);
 
-    _pPlatformServerTransport = new NamedPipeServerTransport(MonacoServerPipeName);
-    _pPlatformServer = new Server(_pPlatformServerTransport, _pServiceCallbacks);
-    _pPlatformServer->Start();
+    _pServerTransport = new NamedPipeServerTransport(HostServerPipeName);
+    _pServer = new Server(_pServerTransport, _pServiceCallbacks);
+    _pServer->Start();
     pLog->Log(LogInfo, "CommPlugin", "Started server comms");
 
 
     // Platform-side Client
-    _pPlatformClientTransport = new NamedPipeClientTransport(MonacoClientPipeName);
-    _pPlatformClientChannel = new Channel(_pPlatformClientTransport);
+    _pClientTransport = new NamedPipeClientTransport(HostClientPipeName);
+    _pClientChannel = new Channel(_pClientTransport);
 
-    _pGameCallbacks = new GameCallbacks(pLog, _pPlatformClientChannel);
-    _pPresentationCallbacks = new PresentationCallbacks(_pGameCallbacks, pLog, _pPlatformClientChannel);
+    _pGameCallbacks = new GameCallbacks(pLog, _pClientChannel);
+    _pReelCallbacks = new ReelCallbacks(_pGameCallbacks, pLog, _pClientChannel);
+    _pPresentationCallbacks = new PresentationCallbacks(_pGameCallbacks, pLog, _pClientChannel);
 
-    _pPlatformClientChannel->Connect();
+    _pClientChannel->Connect();
     pLog->Log(LogInfo, "CommPlugin", "Started client comms");
 
 
-    // Game-side Server
-
     // Game-side Client
+
+    // Game-side Server
 
 }
 
 CommPlugin::~CommPlugin()
 {
-    delete _pRuntimePresentationCallbacks;
-    delete _pRuntimeCallbacks;
-    delete _pGameClientChannel;
-    delete _pGameClientTransport;
-
-    _pGameServer->Stop();
-    delete _pGameServer;
-    delete _pGameServerTransport;
-    delete _pGameServiceCallbacks;
-    delete _pPresentationServiceCallbacks;
-    delete _pGameServiceCallbacks;
-
-
     delete _pPresentationCallbacks;
+    delete _pReelCallbacks;
     delete _pGameCallbacks;
-    delete _pPlatformClientChannel;
-    delete _pPlatformClientTransport;
+    delete _pClientChannel;
+    delete _pClientTransport;
 
-    _pPlatformServer->Stop();
-    delete _pPlatformServer;
-    delete _pPlatformServerTransport;
+    _pServer->Stop();
+    delete _pServer;
+    delete _pServerTransport;
     delete _pRuntimePresentationServiceCallbacks;
     delete _pRuntimeServiceCallbacks;
     delete _pServiceCallbacks;

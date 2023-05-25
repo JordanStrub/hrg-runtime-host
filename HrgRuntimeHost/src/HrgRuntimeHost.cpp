@@ -233,8 +233,7 @@ int MemoryCheckedMain(HINSTANCE hInstance, option::Options& opts)
 						}
 						catch (std::exception& e)
 						{
-
-        						LogCallback::SLogFormat(__log_folder, LogInfo, "Exit", "exception: infer shutdown signal\n%s", e.what());
+                            LogCallback::SLogFormat(__log_folder, LogInfo, "Exit", "exception: infer shutdown signal\n%s", e.what());
 							pRuntime->Shutdown();
 						}
 
