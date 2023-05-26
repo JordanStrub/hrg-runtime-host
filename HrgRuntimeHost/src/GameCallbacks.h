@@ -44,9 +44,9 @@ public:
         return _communication_open;
     }
 
-    bool IsConnected() const
+    void set_communication_open(bool open)
     {
-        return _channel->IsConnected();
+        _communication_open = open;
     }
 
     void Join(JoinRequest& request, Empty& response, Status& status)

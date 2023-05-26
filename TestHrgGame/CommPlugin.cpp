@@ -8,8 +8,8 @@ using namespace Aristocrat::Snapp;
 static LogCallback* pLog = nullptr;
 static CommPlugin* commPlugin = nullptr;
 
-const wchar_t* HostServerPipeName = L"HostRuntimeSnapp";
-const wchar_t* HostClientPipeName = L"HostPlatformSnapp";
+const wchar_t* HostServerPipeName = L"HostGameSnapp";
+const wchar_t* HostClientPipeName = L"HostRuntimeSnapp";
 
 static void StaticLog(int level, std::string message)
 {
@@ -35,7 +35,7 @@ CommPlugin::CommPlugin(LogCallback* pLogCallback)
     pLog = pLogCallback;
     SetExternalLogger(StaticLog);
 
-    // Platform-side Server
+    // Server
     _pServiceCallbacks = new ServiceCallbacks();
     _pRuntimeServiceCallbacks = new RuntimeServiceCallback(pLog);
     _pRuntimePresentationServiceCallbacks = new RuntimePresentationServiceCallback(pLog);
@@ -48,22 +48,19 @@ CommPlugin::CommPlugin(LogCallback* pLogCallback)
     pLog->Log(LogInfo, "CommPlugin", "Started server comms");
 
 
-    // Platform-side Client
+    // Client
     _pClientTransport = new NamedPipeClientTransport(HostClientPipeName);
+    pLog->Log(LogInfo, "CommPlugin", "Created client pipe transport");
     _pClientChannel = new Channel(_pClientTransport);
+    pLog->Log(LogInfo, "CommPlugin", "Created client channel");
 
     _pGameCallbacks = new GameCallbacks(pLog, _pClientChannel);
     _pReelCallbacks = new ReelCallbacks(_pGameCallbacks, pLog, _pClientChannel);
     _pPresentationCallbacks = new PresentationCallbacks(_pGameCallbacks, pLog, _pClientChannel);
+    pLog->Log(LogInfo, "CommPlugin", "Created client callbacks");
 
     _pClientChannel->Connect();
     pLog->Log(LogInfo, "CommPlugin", "Started client comms");
-
-
-    // Game-side Client
-
-    // Game-side Server
-
 }
 
 CommPlugin::~CommPlugin()
@@ -105,7 +102,7 @@ void CommPlugin::Stop()
     _pGameCallbacks->Leave(leave, empty, status);
 }
 
-void CommPlugin::Update(double elapsedTime)
+void CommPlugin::CheckStatus()
 {
     
 }

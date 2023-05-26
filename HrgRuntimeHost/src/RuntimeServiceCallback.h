@@ -20,9 +20,9 @@ public:
         _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateParameters");
         char buf[1000];
         auto map = request.parameters();
-        for (auto iter = map.begin(); iter != map.end(); iter++)
+        for (auto& pair : map)
         {
-            sprintf(buf, "parameter %s = %s", iter->first.c_str(), iter->second.c_str());
+            sprintf(buf, "parameter %s = %s", pair.first.c_str(), pair.second.c_str());
             _pLog->Log(LogInfo, "RuntimeServiceCallback", buf);
         }
         return OK;

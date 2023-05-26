@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LogCallback.h"
+#include "Runtime.h"
 #include "Server.h"
 #include "NamedPipeServerTransport.h"
 #include "NamedPipeClientTransport.h"
@@ -14,36 +15,41 @@
 #include "PresentationCallbacks.h"
 
 using namespace Aristocrat::Snapp;
+using namespace Aristocrat::GdkRuntime::v1;
 
 class CommPlugin
 {
 public:
-    CommPlugin(LogCallback* _pLogCallback);
+    CommPlugin(LogCallback* pLogCallback, Runtime* pRuntime);
     ~CommPlugin();
     void Start();
     void Stop();
-    void Update(double elapsedTime);
+    void CheckStatus();
+
+    static CommPlugin* commPlugin;
 
 private:
+    Runtime* _pRuntime;
+
     NamedPipeClientTransport* _pPlatformClientTransport;
     Channel* _pPlatformClientChannel;
     GameCallbacks* _pGameCallbacks;
     PresentationCallbacks* _pPresentationCallbacks;
 
-    ServiceCallbacks* _pServiceCallbacks;
+    ServiceCallbacks* _pPlatformServiceCallbacks;
     RuntimeServiceCallback* _pRuntimeServiceCallbacks;
     RuntimePresentationServiceCallback* _pRuntimePresentationServiceCallbacks;
     NamedPipeServerTransport* _pPlatformServerTransport;
     Server* _pPlatformServer;
 
-    NamedPipeClientTransport* _pGameClientTransport;
-    Channel* _pGameClientChannel;
+    NamedPipeClientTransport* _pGamesideClientTransport;
+    Channel* _pGamesideClientChannel;
     RuntimeCallbacks* _pRuntimeCallbacks;
     RuntimePresentationCallbacks* _pRuntimePresentationCallbacks;
 
     ServiceCallbacks* _pGamesideServiceCallbacks;
     GameServiceCallback* _pGameServiceCallbacks;
     PresentationServiceCallback* _pPresentationServiceCallbacks;
-    NamedPipeServerTransport* _pGameServerTransport;
-    Server* _pGameServer;
+    NamedPipeServerTransport* _pGamesideServerTransport;
+    Server* _pGamesideServer;
 };

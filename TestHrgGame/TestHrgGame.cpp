@@ -3,6 +3,7 @@
 //
 
 #include "pch.h"
+#include "shellapi.h"
 #include "framework.h"
 #include "TestHrgGame.h"
 
@@ -27,6 +28,31 @@ HANDLE _hRunOnceMutex = NULL;
 BEGIN_MESSAGE_MAP(CTestHrgGameApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
+
+void get_command_line_args(int* argc, char*** argv)
+{
+	// Get the command line arguments as wchar_t strings
+	wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(), argc);
+	if (!wargv) { *argc = 0; *argv = NULL; return; }
+
+	// Count the number of bytes necessary to store the UTF-8 versions of those strings
+	int n = 0;
+	for (int i = 0; i < *argc; i++)
+		n += WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, NULL, 0, NULL, NULL) + 1;
+
+	// Allocate the argv[] array + all the UTF-8 strings
+	*argv = (char**)malloc((*argc + 1) * sizeof(char*) + n);
+	if (!*argv) { *argc = 0; return; }
+
+	// Convert all wargv[] --> argv[]
+	char* arg = (char*)&((*argv)[*argc + 1]);
+	for (int i = 0; i < *argc; i++)
+	{
+		(*argv)[i] = arg;
+		arg += WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, arg, n, NULL, NULL) + 1;
+	}
+	(*argv)[*argc] = NULL;
+}
 
 
 // CTestHrgGameApp construction
@@ -79,8 +105,16 @@ BOOL CTestHrgGameApp::InitInstance()
 	// Change the registry key under which our settings are stored
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization
-	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
+	SetRegistryKey(_T("TestHrgGame"));
 
+	int argc = 0;
+	char** argv;
+	get_command_line_args(&argc, &argv);
+	if (argc > 1)
+		strcpy(__log_folder, argv[1]);
+	else
+		strcpy(__log_folder, ".");
+	free(argv);
 
 	_hRunOnceMutex = OpenMutexA(MUTEX_ALL_ACCESS, 0, "GameHostProcess");
 	LogCallback::SLog(__log_folder, LogInfo, "Game", "");
@@ -96,7 +130,7 @@ BOOL CTestHrgGameApp::InitInstance()
 	}
 	LogCallback::SLog(__log_folder, LogInfo, "Args", "Using SNAPP");
 	auto logger = new LogCallback(DefaultLogLevel, __log_folder);
-	CommPlugin* pCommPlugin = new CommPlugin(logger);
+	auto pCommPlugin = new CommPlugin(logger);
 	pCommPlugin->Start();
 	LogCallback::SLog(__log_folder, LogInfo, "Init", "Started SNAPP host.");
 
@@ -106,18 +140,19 @@ BOOL CTestHrgGameApp::InitInstance()
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{
+		LogCallback::SLog(__log_folder, LogInfo, "End", "Dialog dismissed with OK.");
 		// TODO: Place code here to handle when the dialog is
 		//  dismissed with OK
 	}
 	else if (nResponse == IDCANCEL)
 	{
+		LogCallback::SLog(__log_folder, LogInfo, "End", "Dialog dismissed with Cancel.");
 		// TODO: Place code here to handle when the dialog is
 		//  dismissed with Cancel
 	}
 	else if (nResponse == -1)
 	{
-		TRACE(traceAppMsg, 0, "Warning: dialog creation failed, so application is terminating unexpectedly.\n");
-		TRACE(traceAppMsg, 0, "Warning: if you are using MFC controls on the dialog, you cannot #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS.\n");
+		LogCallback::SLog(__log_folder, LogInfo, "End", "Warning: dialog creation failed, so application is terminating unexpectedly.");
 	}
 
 	//// Delete the shell manager created above.

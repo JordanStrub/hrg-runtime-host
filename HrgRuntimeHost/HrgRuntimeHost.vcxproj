@@ -92,7 +92,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="lib\timer.cpp" />
     <ClCompile Include="src\CommPlugin.cpp" />
     <ClCompile Include="src\HrgRuntimeHost.cpp" />
     <ClCompile Include="src\Runtime.cpp" />
@@ -104,11 +103,12 @@
     <ClInclude Include="lib\simplewindow.h" />
     <ClInclude Include="lib\stringutil.h" />
     <ClInclude Include="lib\symlookup.h" />
-    <ClInclude Include="lib\timer.h" />
     <ClInclude Include="lib\winutil.h" />
     <ClInclude Include="src\CommPlugin.h" />
     <ClInclude Include="src\GameCallbacks.h" />
     <ClInclude Include="src\GameServiceCallback.h" />
+    <ClInclude Include="src\ICommPlugin.h" />
+    <ClInclude Include="src\IRuntime.h" />
     <ClInclude Include="src\PresentationCallbacks.h" />
     <ClInclude Include="src\PresentationServiceCallback.h" />
     <ClInclude Include="src\Runtime.h" />

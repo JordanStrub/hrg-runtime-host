@@ -9,14 +9,14 @@ using namespace Aristocrat::GdkRuntime::v1;
 
 class RuntimeCallbacks
 {
+    bool _communication_open;
     RuntimeServiceStub* _stub;
-    GameCallbacks* _pGameCallbacks;
     LogCallback* _pLog;
 public:
-    RuntimeCallbacks(GameCallbacks* pGameCallbacks, LogCallback* pLog, Channel* channel)
+    RuntimeCallbacks(LogCallback* pLog, Channel* channel)
         : _stub(new RuntimeServiceStub(channel))
-        , _pGameCallbacks(pGameCallbacks)
         , _pLog(pLog)
+        , _communication_open(true)
     {
     }
 
@@ -33,9 +33,24 @@ public:
         }
     }
 
+    bool is_communication_open()
+    {
+        if (!_communication_open)
+        {
+            Log(LogDebug, "OUTGOING COMMUNICATION IS CLOSED.");
+        }
+
+        return _communication_open;
+    }
+
+    void set_communication_open(bool open)
+    {
+        _communication_open = open;
+    }
+
     void GetState(Empty& request, GetStateResponse& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "GetState()");
             _stub->GetState(request, response, status);
@@ -44,7 +59,7 @@ public:
 
     void UpdateState(UpdateStateRequest& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "UpdateState()");
             _stub->UpdateState(request, response, status);
@@ -53,7 +68,7 @@ public:
 
     void GetFlag(GetFlagRequest& request, GetFlagResponse& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "GetFlag()");
             _stub->GetFlag(request, response, status);
@@ -62,7 +77,7 @@ public:
 
     void UpdateFlag(UpdateFlagRequest& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "UpdateFlag()");
             _stub->UpdateFlag(request, response, status);
@@ -71,7 +86,7 @@ public:
 
     void UpdateParameters(UpdateParametersRequest& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "UpdateParameters()");
             _stub->UpdateParameters(request, response, status);
@@ -80,7 +95,7 @@ public:
 
     void UpdateLocalTimeTranslationBias(UpdateLocalTimeTranslationBiasRequest& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "UpdateLocalTimeTranslationBias()");
             _stub->UpdateLocalTimeTranslationBias(request, response, status);
@@ -89,7 +104,7 @@ public:
 
     void UpdateButtonState(UpdateButtonStateRequest& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "UpdateButtonState()");
             _stub->UpdateButtonState(request, response, status);
@@ -98,7 +113,7 @@ public:
 
     void UpdateBalance(UpdateBalanceNotification& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "UpdateBalance()");
             _stub->UpdateBalance(request, response, status);
@@ -107,7 +122,7 @@ public:
 
     void UpdatePlatformMessage(UpdatePlatformMessageRequest& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "UpdatePlatformMessage()");
             _stub->UpdatePlatformMessage(request, response, status);
@@ -116,7 +131,7 @@ public:
 
     void UpdateVolume(VolumeUpdateNotification& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "UpdateVolume()");
             _stub->UpdateVolume(request, response, status);
@@ -125,7 +140,7 @@ public:
 
     void UpdateTimeRemaining(UpdateTimeRemainingRequest& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "UpdateTimeRemaining()");
             _stub->UpdateTimeRemaining(request, response, status);
@@ -134,7 +149,7 @@ public:
 
     void UpdateHandCount(UpdateHandCountNotification& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "UpdateHandCount()");
             _stub->UpdateHandCount(request, response, status);
@@ -143,7 +158,7 @@ public:
 
     void InvokeButton(InvokeButtonRequest& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "InvokeButton()");
             _stub->InvokeButton(request, response, status);
@@ -152,7 +167,7 @@ public:
 
     void BeginGameRoundResult(BeginGameRoundNotification& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "BeginGameRoundResult()");
             _stub->BeginGameRoundResult(request, response, status);
@@ -161,7 +176,7 @@ public:
 
     void OnJackpotUpdated(Empty& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "OnJackpotUpdated()");
             _stub->OnJackpotUpdated(request, response, status);
@@ -170,7 +185,7 @@ public:
 
     void JackpotWinAvailable(JackpotWinAvailableNotification& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "JackpotWinAvailable()");
             _stub->JackpotWinAvailable(request, response, status);
@@ -179,7 +194,7 @@ public:
 
     void Shutdown(Empty& request, Empty& response, Status& status)
     {
-        if (_pGameCallbacks->is_communication_open())
+        if (is_communication_open())
         {
             Log(LogInfo, "Shutdown()");
             _stub->Shutdown(request, response, status);

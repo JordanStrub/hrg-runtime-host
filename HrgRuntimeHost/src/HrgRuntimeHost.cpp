@@ -4,7 +4,6 @@
 
 #include "LogCallback.h"
 #include "optionparser.h"
-#include "timer.h"
 #include "winutil.h"
 #include "debug.h"
 #include "simplewindow.h"
@@ -31,9 +30,6 @@ CRITICAL_SECTION LogCallback::_hSection = { 0 };
 int LogCallback::_logLevel = DefaultLogLevel;
 bool LogCallback::_initialized = false;
 const char* APPLICATION_NAME = "HrgRuntimeHost";
-const char* CONFIG = "Config";
-const char* MARKET = "Market";
-const char* MARKET_CONFIGURATION_NAME = "/Runtime/Market/ConfigurationName";
 
 HANDLE _hRunOnceMutex = NULL;
 
@@ -175,13 +171,13 @@ int MemoryCheckedMain(HINSTANCE hInstance, option::Options& opts)
 
     {
 		auto logger = new LogCallback(DefaultLogLevel, __log_folder);
-		Runtime* pRuntime = new Runtime(logger);
-		CommPlugin* pCommPlugin = new CommPlugin(logger);
+		auto pRuntime = new Runtime(logger);
+		auto pCommPlugin = new CommPlugin(logger, pRuntime);
 
 		// pass information to GDKRuntime
 		if (!gameVariation.empty())
 		{
-			if (!pRuntime->SetParameter("/Runtime/Variation/SelectedID", gameVariation.c_str(), CONFIG))
+			if (!pRuntime->SetConfigParameter("/Runtime/Variation/SelectedID", gameVariation.c_str()))
 			{
 				LogCallback::SLogFormat(__log_folder, LogInfo, "Args", "Variation ID not accepted %s", gameVariation.c_str());
 			}
@@ -191,67 +187,53 @@ int MemoryCheckedMain(HINSTANCE hInstance, option::Options& opts)
 		{
 			char denomStr[MAX_PATH];
 			sprintf(denomStr, "%d", gameDenomination);
-			pRuntime->SetParameter("/Runtime/Denomination", denomStr, CONFIG);
+			pRuntime->SetConfigParameter("/Runtime/Denomination", denomStr);
 		}
 
 		LogCallback::SLog(__log_folder, LogInfo, "Init", "Configured Runtime");
 
-		//pCommPlugin->Start();
-		//LogCallback::SLog(__log_folder, LogInfo, "Init", "Started SNAPP host.");
+		pCommPlugin->Start();
+		LogCallback::SLog(__log_folder, LogInfo, "Init", "Started SNAPP host.");
 
 		LogCallback::SLogFormat(__log_folder, LogInfo, "Init", "Loading Game Module %s.", gameModulePath);
 		/* try and load a game module from path provided */
 
-		if (pRuntime->LoadFromModule(gameModulePath))
+		if (pRuntime->LoadFromModule(gameModulePath, __log_folder))
 		{
-			LogCallback::SLog(__log_folder, LogInfo, "Init", "Game Module loaded successfully.");
-			// game ignores index provided, it just takes the order of the list given.. (sort needed in AddDisplay)
-			/* Pre-loading configurations */
-			pRuntime->Configure();
-			LogCallback::SLog(__log_folder, LogInfo, "Init", "Runtime Configuration Complete.");
+			LogCallback::SLog(__log_folder, LogInfo, "Init", "Game Module loaded successfully, initialized.");
 
-			pCommPlugin->Start();
-			LogCallback::SLog(__log_folder, LogInfo, "Init", "Started SNAPP host.");
-
-			if (pRuntime->Initialize())/* Initializes game (will create instance of client and server) */
-			{
-				LogCallback::SLog(__log_folder, LogInfo, "Init", "Runtime Initialized.");
-
+			try
+            {
 				LogCallback::SLog(__log_folder, LogInfo, "Init", "Entering Main Loop.");
 
-				try
-                {
-                    timer global_timer;
-                    // Message Pumping (global) until WM_QUIT (fired by PostQuit)
-					while (SimpleWindow::RunMessageLoopOnce())
+                // Message Pumping (global) until WM_QUIT (fired by PostQuit)
+				while (SimpleWindow::RunMessageLoopOnce())
+				{
+					try
 					{
-						double elapsedTime = (double)global_timer.getElapsedTimeInSec();
+						pCommPlugin->CheckStatus();
+						::Sleep(50);
+					}
+					catch (std::exception& e)
+					{
+                        LogCallback::SLogFormat(__log_folder, LogInfo, "Exit", "exception: infer shutdown signal\n%s", e.what());
+						pRuntime->Shutdown();
+					}
 
-						try
-						{
-								pCommPlugin->Update(elapsedTime);
-						}
-						catch (std::exception& e)
-						{
-                            LogCallback::SLogFormat(__log_folder, LogInfo, "Exit", "exception: infer shutdown signal\n%s", e.what());
-							pRuntime->Shutdown();
-						}
-
-						if (pRuntime->IsPendingShutdown())
-						{
-							LogCallback::SLogFormat(__log_folder, LogInfo, "Main", "Received Shutdown.");
-							PostQuitMessage(0);
-							break;
-						}
+					if (pRuntime->IsPendingShutdown())
+					{
+						LogCallback::SLogFormat(__log_folder, LogInfo, "Main", "Received Shutdown.");
+						PostQuitMessage(0);
+						break;
 					}
 				}
-				catch (std::exception& fe)
-				{
-					LogCallback::SLogFormat(__log_folder, LogInfo, "Exit", "Runtime Fatal Exception\n%s", fe.what());
-					PostQuitMessage(0);
-				}
-				LogCallback::SLogFormat(__log_folder, LogInfo, "Main", "Main loop exited");
 			}
+			catch (std::exception& fe)
+			{
+				LogCallback::SLogFormat(__log_folder, LogInfo, "Exit", "Runtime Fatal Exception\n%s", fe.what());
+				PostQuitMessage(0);
+			}
+			LogCallback::SLogFormat(__log_folder, LogInfo, "Main", "Main loop exited");
 		}
 		else
 		{
@@ -268,7 +250,7 @@ void on_exit()
 }
 
 void signalHandler(int signum) {
-	LogCallback::SLogFormat(__log_folder, LogInfo, "signalHandler", "signum %d", signum);
+	LogCallback::SLogFormat(__log_folder, LogInfo, "signalHandler", "signal %d", signum);
 }
 
 int main(int argc, char** argv)

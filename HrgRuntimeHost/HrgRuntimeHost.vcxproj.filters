@@ -27,9 +27,6 @@
     <ClCompile Include="src\CommPlugin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lib\timer.cpp">
-      <Filter>lib</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\optionparser.h">
@@ -45,9 +42,6 @@
       <Filter>lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\symlookup.h">
-      <Filter>lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\timer.h">
       <Filter>lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\LogCallback.h">
@@ -84,6 +78,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\GameServiceCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ICommPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IRuntime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

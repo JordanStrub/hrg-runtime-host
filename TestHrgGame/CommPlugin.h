@@ -19,7 +19,7 @@ public:
     ~CommPlugin();
     void Start();
     void Stop();
-    void Update(double elapsedTime);
+    void CheckStatus();
 
 private:
     NamedPipeClientTransport* _pClientTransport;
