@@ -7,6 +7,7 @@
 #include <string>
 #include "LogCallback.h"
 
+class CommPlugin;
 
 // CTestHrgGameDlg dialog
 class CTestHrgGameDlg : public CDialogEx
@@ -14,6 +15,7 @@ class CTestHrgGameDlg : public CDialogEx
 // Construction
 public:
 	CTestHrgGameDlg(LogCallback* pLogger, CWnd* pParent = nullptr);	// standard constructor
+	void SetCommPlugin(CommPlugin* pCommPlugin) { m_pCommPlugin = pCommPlugin; }
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -33,6 +35,7 @@ private:
 protected:
 	HICON m_hIcon;
 	LogCallback* m_pLog;
+	CommPlugin* m_pCommPlugin;
 	bool m_bInitialized = false;
 	std::map<std::string, std::string> m_mParameters;
 

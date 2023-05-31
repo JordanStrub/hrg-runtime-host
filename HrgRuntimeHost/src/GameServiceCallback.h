@@ -14,12 +14,15 @@ class GameServiceCallback : public IGameServiceCallback
     Runtime* _pRuntime;
     RuntimeCallbacks* _pRuntimeCallbacks;
     Channel* _pClientChannel;
+    GameCallbacks* _pPlatformGameCallbacks;
 public:
-    GameServiceCallback(LogCallback* pLogCallback, Runtime* pRuntime, RuntimeCallbacks* pRuntimeCallbacks, Channel* pClientChannel)
+    GameServiceCallback(LogCallback* pLogCallback, Runtime* pRuntime, RuntimeCallbacks* pRuntimeCallbacks, Channel* pClientChannel,
+        GameCallbacks* pPlatformGameCallbacks)
     : _pLog(pLogCallback)
     , _pRuntime(pRuntime)
     , _pRuntimeCallbacks(pRuntimeCallbacks)
     , _pClientChannel(pClientChannel)
+    , _pPlatformGameCallbacks(pPlatformGameCallbacks)
     {
     }
     virtual StatusCode Join(JoinRequest& request, Empty& response, Status& status)
@@ -29,9 +32,15 @@ public:
         _pClientChannel->Connect();
         _pLog->Log(LogInfo, "CommPlugin", "Started game-side client comms");
 
-        return OK;
+        _pPlatformGameCallbacks->Join(request, response, status);
+        return status.status_code();
     }
-    virtual StatusCode Leave(LeaveRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback from game", "Called Leave"); return OK; }
+    virtual StatusCode Leave(LeaveRequest& request, Empty& response, Status& status)
+    {
+        _pLog->Log(LogInfo, "GameServiceCallback from game", "Called Leave");
+        _pPlatformGameCallbacks->Leave(request, response, status);
+        return status.status_code();
+    }
     virtual StatusCode FatalError(FatalErrorNotification& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback from game", "Called FatalError"); return OK; }
     virtual StatusCode RuntimeEvent(RuntimeEventNotification& request, Empty& response, Status& status)
     {
@@ -52,14 +61,15 @@ public:
                 }
                 _pRuntimeCallbacks->UpdateParameters(parametersRequest, response, status);
                 _pLog->Log(LogDebug, "...", "called callbacks->UpdateParameters");
-        }
+            }
             break;
         default:
             _pLog->Log(LogDebug, "...", "NOT RuntimeEventNotification::RequestConfiguration");
             break;
         }
 
-        return OK;
+        _pPlatformGameCallbacks->RuntimeEvent(request, response, status);
+        return status.status_code();
     }
     virtual StatusCode RuntimeFlagChange(RuntimeFlagNotification& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback from game", "Called RuntimeFlagChange"); return OK; }
     virtual StatusCode RuntimeRequest(RuntimeRequestNotification& request, RuntimeRequestResponse& response, Status& status) { _pLog->Log(LogInfo, "GameServiceCallback from game", "Called RuntimeRequest"); return OK; }

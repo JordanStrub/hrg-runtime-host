@@ -33,23 +33,23 @@ private:
 
     NamedPipeClientTransport* _pPlatformClientTransport;
     Channel* _pPlatformClientChannel;
-    GameCallbacks* _pGameCallbacks;
-    PresentationCallbacks* _pPresentationCallbacks;
+    GameCallbacks* _pPlatformGameCallbacks;
+    PresentationCallbacks* _pPlatformPresentationCallbacks;
 
     ServiceCallbacks* _pPlatformServiceCallbacks;
-    RuntimeServiceCallback* _pRuntimeServiceCallbacks;
-    RuntimePresentationServiceCallback* _pRuntimePresentationServiceCallbacks;
+    RuntimeServiceCallback* _pPlatformRuntimeServiceCallbacks;
+    RuntimePresentationServiceCallback* _pPlatformRuntimePresentationServiceCallbacks;
     NamedPipeServerTransport* _pPlatformServerTransport;
     Server* _pPlatformServer;
 
     NamedPipeClientTransport* _pGamesideClientTransport;
     Channel* _pGamesideClientChannel;
-    RuntimeCallbacks* _pRuntimeCallbacks;
-    RuntimePresentationCallbacks* _pRuntimePresentationCallbacks;
+    RuntimeCallbacks* _pGamesideRuntimeCallbacks;
+    RuntimePresentationCallbacks* _pGamesideRuntimePresentationCallbacks;
 
     ServiceCallbacks* _pGamesideServiceCallbacks;
-    GameServiceCallback* _pGameServiceCallbacks;
-    PresentationServiceCallback* _pPresentationServiceCallbacks;
+    GameServiceCallback* _pGamesideGameServiceCallbacks;
+    PresentationServiceCallback* _pGamesidePresentationServiceCallbacks;
     NamedPipeServerTransport* _pGamesideServerTransport;
     Server* _pGamesideServer;
 };

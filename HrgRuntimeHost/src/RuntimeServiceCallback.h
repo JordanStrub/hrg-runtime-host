@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LogCallback.h"
+#include "RuntimeCallbacks.h"
 #include "runtimeService.snapp.pb.h"
 
 using namespace Aristocrat::GdkRuntime::v1;
@@ -9,8 +10,12 @@ using namespace Aristocrat::Snapp;
 class RuntimeServiceCallback : public IRuntimeServiceCallback
 {
     LogCallback* _pLog;
+    RuntimeCallbacks* _pGamesideRuntimeCallbacks;
 public:
-    RuntimeServiceCallback(LogCallback* pLogCallback) : _pLog(pLogCallback) {}
+    RuntimeServiceCallback(LogCallback* pLogCallback, RuntimeCallbacks* pGamesideRuntimeCallbacks)
+    : _pLog(pLogCallback)
+    , _pGamesideRuntimeCallbacks(pGamesideRuntimeCallbacks)
+    {}
     virtual StatusCode GetState(Empty& request, GetStateResponse& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called GetState"); return OK; };
     virtual StatusCode UpdateState(UpdateStateRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateState"); return OK; };
     virtual StatusCode GetFlag(GetFlagRequest& request, GetFlagResponse& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called GetFlag"); return OK; };
@@ -25,7 +30,9 @@ public:
             sprintf(buf, "parameter %s = %s", pair.first.c_str(), pair.second.c_str());
             _pLog->Log(LogInfo, "RuntimeServiceCallback", buf);
         }
-        return OK;
+
+        _pGamesideRuntimeCallbacks->UpdateParameters(request, response, status);
+        return status.status_code();
     };
     virtual StatusCode UpdateLocalTimeTranslationBias(UpdateLocalTimeTranslationBiasRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateLocalTimeTranslationBias"); return OK; };
     virtual StatusCode UpdateButtonState(UpdateButtonStateRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateButtonState"); return OK; };

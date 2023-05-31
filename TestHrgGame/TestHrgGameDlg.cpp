@@ -6,7 +6,7 @@
 #include "framework.h"
 #include "TestHrgGame.h"
 #include "TestHrgGameDlg.h"
-
+#include "CommPlugin.h"
 #include "afxdialogex.h"
 
 #ifdef _DEBUG
@@ -174,7 +174,7 @@ void CTestHrgGameDlg::OnBnClickedOk()
 
 void CTestHrgGameDlg::OnBnClickedCancel()
 {
-	// TODO: Add your control notification handler code here
+	m_pCommPlugin->Stop();
 	CDialogEx::OnCancel();
 }
 

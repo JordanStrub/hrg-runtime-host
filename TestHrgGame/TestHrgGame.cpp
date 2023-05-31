@@ -136,6 +136,7 @@ BOOL CTestHrgGameApp::InitInstance()
 	auto logger = new LogCallback(DefaultLogLevel, __log_folder);
 	CTestHrgGameDlg dlg(logger);
 	auto pCommPlugin = new CommPlugin(logger, &dlg);
+	dlg.SetCommPlugin(pCommPlugin);
 	pCommPlugin->Start();
 	LogCallback::SLog(__log_folder, LogInfo, "Init", "Started SNAPP host.");
 

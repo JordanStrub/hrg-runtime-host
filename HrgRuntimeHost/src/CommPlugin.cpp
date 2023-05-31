@@ -37,12 +37,24 @@ CommPlugin::CommPlugin(LogCallback* pLogCallback, Runtime* pRuntime)
     pLog = pLogCallback;
     SetExternalLogger(StaticLog);
 
+    // First build up clients, so they can be called from the opposite-side servers.
+    _pPlatformClientTransport = new NamedPipeClientTransport(MonacoClientPipeName);
+    _pPlatformClientChannel = new Channel(_pPlatformClientTransport);
+    _pPlatformGameCallbacks = new GameCallbacks(pLog, _pPlatformClientChannel);
+    _pPlatformPresentationCallbacks = new PresentationCallbacks(_pPlatformGameCallbacks, pLog, _pPlatformClientChannel);
+
+    _pGamesideClientTransport = new NamedPipeClientTransport(HostClientPipeName);
+    _pGamesideClientChannel = new Channel(_pGamesideClientTransport);
+    _pGamesideRuntimeCallbacks = new RuntimeCallbacks(pLog, _pGamesideClientChannel);
+    _pGamesideRuntimePresentationCallbacks = new RuntimePresentationCallbacks(_pGamesideRuntimeCallbacks, pLog, _pGamesideClientChannel);
+
+
     // Platform-side Server
     _pPlatformServiceCallbacks = new ServiceCallbacks();
-    _pRuntimeServiceCallbacks = new RuntimeServiceCallback(pLog);
-    _pRuntimePresentationServiceCallbacks = new RuntimePresentationServiceCallback(pLog);
-    _pPlatformServiceCallbacks->AddCallback(*_pRuntimeServiceCallbacks);
-    _pPlatformServiceCallbacks->AddCallback(*_pRuntimePresentationServiceCallbacks);
+    _pPlatformRuntimeServiceCallbacks = new RuntimeServiceCallback(pLog, _pGamesideRuntimeCallbacks);
+    _pPlatformRuntimePresentationServiceCallbacks = new RuntimePresentationServiceCallback(pLog, _pGamesideRuntimePresentationCallbacks);
+    _pPlatformServiceCallbacks->AddCallback(*_pPlatformRuntimeServiceCallbacks);
+    _pPlatformServiceCallbacks->AddCallback(*_pPlatformRuntimePresentationServiceCallbacks);
 
     _pPlatformServerTransport = new NamedPipeServerTransport(MonacoServerPipeName);
     _pPlatformServer = new Server(_pPlatformServerTransport, _pPlatformServiceCallbacks);
@@ -50,31 +62,17 @@ CommPlugin::CommPlugin(LogCallback* pLogCallback, Runtime* pRuntime)
     pLog->Log(LogInfo, "CommPlugin", "Started platform server comms");
 
 
-    // Platform-side Client
-    _pPlatformClientTransport = new NamedPipeClientTransport(MonacoClientPipeName);
-    _pPlatformClientChannel = new Channel(_pPlatformClientTransport);
-
-    _pGameCallbacks = new GameCallbacks(pLog, _pPlatformClientChannel);
-    _pPresentationCallbacks = new PresentationCallbacks(_pGameCallbacks, pLog, _pPlatformClientChannel);
-
+    // Platform-side Client: Go!
     _pPlatformClientChannel->Connect();
     pLog->Log(LogInfo, "CommPlugin", "Started platform client comms");
 
 
-    // Game-side Client, later we'll connect.
-    _pGamesideClientTransport = new NamedPipeClientTransport(HostClientPipeName);
-    _pGamesideClientChannel = new Channel(_pGamesideClientTransport);
-
-    _pRuntimeCallbacks = new RuntimeCallbacks(pLog, _pGamesideClientChannel);
-    _pRuntimePresentationCallbacks = new RuntimePresentationCallbacks(_pRuntimeCallbacks, pLog, _pGamesideClientChannel);
-
-
     // Game-side Server
     _pGamesideServiceCallbacks = new ServiceCallbacks();
-    _pGameServiceCallbacks = new GameServiceCallback(pLog, _pRuntime, _pRuntimeCallbacks, _pGamesideClientChannel);
-    _pPresentationServiceCallbacks = new PresentationServiceCallback(pLog);
-    _pGamesideServiceCallbacks->AddCallback(*_pGameServiceCallbacks);
-    _pGamesideServiceCallbacks->AddCallback(*_pPresentationServiceCallbacks);
+    _pGamesideGameServiceCallbacks = new GameServiceCallback(pLog, _pRuntime, _pGamesideRuntimeCallbacks, _pGamesideClientChannel, _pPlatformGameCallbacks);
+    _pGamesidePresentationServiceCallbacks = new PresentationServiceCallback(pLog, _pPlatformPresentationCallbacks);
+    _pGamesideServiceCallbacks->AddCallback(*_pGamesideGameServiceCallbacks);
+    _pGamesideServiceCallbacks->AddCallback(*_pGamesidePresentationServiceCallbacks);
 
     _pGamesideServerTransport = new NamedPipeServerTransport(HostServerPipeName);
     _pGamesideServer = new Server(_pGamesideServerTransport, _pGamesideServiceCallbacks);
@@ -84,45 +82,45 @@ CommPlugin::CommPlugin(LogCallback* pLogCallback, Runtime* pRuntime)
 
 CommPlugin::~CommPlugin()
 {
-    delete _pRuntimePresentationCallbacks;
-    delete _pRuntimeCallbacks;
+    delete _pGamesideRuntimePresentationCallbacks;
+    delete _pGamesideRuntimeCallbacks;
     delete _pGamesideClientChannel;
     delete _pGamesideClientTransport;
 
     _pGamesideServer->Stop();
     delete _pGamesideServer;
     delete _pGamesideServerTransport;
-    delete _pGameServiceCallbacks;
-    delete _pPresentationServiceCallbacks;
-    delete _pGameServiceCallbacks;
+    delete _pGamesideGameServiceCallbacks;
+    delete _pGamesidePresentationServiceCallbacks;
+    delete _pGamesideGameServiceCallbacks;
 
 
-    delete _pPresentationCallbacks;
-    delete _pGameCallbacks;
+    delete _pPlatformPresentationCallbacks;
+    delete _pPlatformGameCallbacks;
     delete _pPlatformClientChannel;
     delete _pPlatformClientTransport;
 
     _pPlatformServer->Stop();
     delete _pPlatformServer;
     delete _pPlatformServerTransport;
-    delete _pRuntimePresentationServiceCallbacks;
-    delete _pRuntimeServiceCallbacks;
+    delete _pPlatformRuntimePresentationServiceCallbacks;
+    delete _pPlatformRuntimeServiceCallbacks;
     delete _pPlatformServiceCallbacks;
 }
 
 
 void CommPlugin::Start()
 {
-    ::Sleep(250);
-    JoinRequest join;
-    Empty empty;
-    Status status;
-    _pGameCallbacks->Join(join, empty, status);
+    //::Sleep(250);
+    //JoinRequest join;
+    //Empty empty;
+    //Status status;
+    //_pPlatformGameCallbacks->Join(join, empty, status);
 
-    ::Sleep(250);
-    RuntimeEventNotification notify;
-    notify.set_runtimeevent(RuntimeEventNotification_RuntimeEvent_RequestConfiguration);
-    _pGameCallbacks->RuntimeEvent(notify, empty, status);
+    //::Sleep(250);
+    //RuntimeEventNotification notify;
+    //notify.set_runtimeevent(RuntimeEventNotification_RuntimeEvent_RequestConfiguration);
+    //_pPlatformGameCallbacks->RuntimeEvent(notify, empty, status);
 }
 
 void CommPlugin::Stop()
@@ -130,11 +128,11 @@ void CommPlugin::Stop()
     LeaveRequest leave;
     Empty empty;
     Status status;
-    _pGameCallbacks->Leave(leave, empty, status);
+    _pPlatformGameCallbacks->Leave(leave, empty, status);
 }
 
 void CommPlugin::CheckStatus()
 {
-    _pGameCallbacks->set_communication_open(_pPlatformClientChannel->IsConnected());
-    _pRuntimeCallbacks->set_communication_open(_pGamesideClientChannel->IsConnected());
+    _pPlatformGameCallbacks->set_communication_open(_pPlatformClientChannel->IsConnected());
+    _pGamesideRuntimeCallbacks->set_communication_open(_pGamesideClientChannel->IsConnected());
 }
