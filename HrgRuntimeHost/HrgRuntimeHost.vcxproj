@@ -63,6 +63,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Externals\google-protobuf\include;$(SolutionDir)Externals\Aristocrat.GdkRuntime.SnappCpp\include;$(SolutionDir)Externals\Aristocrat.SnappCpp\include;$(ProjectDir)\lib</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

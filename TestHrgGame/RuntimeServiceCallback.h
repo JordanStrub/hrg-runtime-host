@@ -2,6 +2,7 @@
 
 #include "LogCallback.h"
 #include "runtimeService.snapp.pb.h"
+#include "TestHrgGameDlg.h"
 
 using namespace Aristocrat::GdkRuntime::v1;
 using namespace Aristocrat::Snapp;
@@ -9,8 +10,12 @@ using namespace Aristocrat::Snapp;
 class RuntimeServiceCallback : public IRuntimeServiceCallback
 {
     LogCallback* _pLog;
+    CTestHrgGameDlg* _pDialog;
 public:
-    RuntimeServiceCallback(LogCallback* pLogCallback) : _pLog(pLogCallback) {}
+    RuntimeServiceCallback(LogCallback* pLogCallback, CTestHrgGameDlg* pDialog)
+    : _pLog(pLogCallback)
+    , _pDialog(pDialog)
+    {}
     virtual StatusCode GetState(Empty& request, GetStateResponse& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called GetState"); return OK; };
     virtual StatusCode UpdateState(UpdateStateRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateState"); return OK; };
     virtual StatusCode GetFlag(GetFlagRequest& request, GetFlagResponse& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called GetFlag"); return OK; };
@@ -20,11 +25,15 @@ public:
         _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateParameters");
         char buf[1000];
         auto map = request.parameters();
+        std::map<std::string, std::string> new_map;
         for (auto& pair : map)
         {
             sprintf(buf, "parameter %s = %s", pair.first.c_str(), pair.second.c_str());
             _pLog->Log(LogInfo, "RuntimeServiceCallback", buf);
+
+            new_map[pair.first] = pair.second;
         }
+        _pDialog->UpdateParameters(new_map);
         return OK;
     };
     virtual StatusCode UpdateLocalTimeTranslationBias(UpdateLocalTimeTranslationBiasRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateLocalTimeTranslationBias"); return OK; };

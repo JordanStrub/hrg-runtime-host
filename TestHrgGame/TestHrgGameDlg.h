@@ -3,6 +3,9 @@
 //
 
 #pragma once
+#include <map>
+#include <string>
+#include "LogCallback.h"
 
 
 // CTestHrgGameDlg dialog
@@ -10,20 +13,28 @@ class CTestHrgGameDlg : public CDialogEx
 {
 // Construction
 public:
-	CTestHrgGameDlg(CWnd* pParent = nullptr);	// standard constructor
+	CTestHrgGameDlg(LogCallback* pLogger, CWnd* pParent = nullptr);	// standard constructor
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_TESTHRGGAME_DIALOG };
 #endif
 
-	protected:
+	void UpdateParameters(std::map<std::string, std::string>& parameters);
+
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
 
 // Implementation
+private:
+	void TryUpdateParameterList();
+
 protected:
 	HICON m_hIcon;
+	LogCallback* m_pLog;
+	bool m_bInitialized = false;
+	std::map<std::string, std::string> m_mParameters;
 
 	// Generated message map functions
 	virtual BOOL OnInitDialog();

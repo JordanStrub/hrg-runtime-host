@@ -29,7 +29,8 @@ static void StaticLog(int level, std::string message)
     }
 }
 
-CommPlugin::CommPlugin(LogCallback* pLogCallback)
+CommPlugin::CommPlugin(LogCallback* pLogCallback, CTestHrgGameDlg* pDialog)
+    : _pDialog(pDialog)
 {
     commPlugin = this;
     pLog = pLogCallback;
@@ -37,7 +38,7 @@ CommPlugin::CommPlugin(LogCallback* pLogCallback)
 
     // Server
     _pServiceCallbacks = new ServiceCallbacks();
-    _pRuntimeServiceCallbacks = new RuntimeServiceCallback(pLog);
+    _pRuntimeServiceCallbacks = new RuntimeServiceCallback(pLog, pDialog);
     _pRuntimePresentationServiceCallbacks = new RuntimePresentationServiceCallback(pLog);
     _pServiceCallbacks->AddCallback(*_pRuntimeServiceCallbacks);
     _pServiceCallbacks->AddCallback(*_pRuntimePresentationServiceCallbacks);
@@ -55,7 +56,6 @@ CommPlugin::CommPlugin(LogCallback* pLogCallback)
     pLog->Log(LogInfo, "CommPlugin", "Created client channel");
 
     _pGameCallbacks = new GameCallbacks(pLog, _pClientChannel);
-    _pReelCallbacks = new ReelCallbacks(_pGameCallbacks, pLog, _pClientChannel);
     _pPresentationCallbacks = new PresentationCallbacks(_pGameCallbacks, pLog, _pClientChannel);
     pLog->Log(LogInfo, "CommPlugin", "Created client callbacks");
 
@@ -66,7 +66,6 @@ CommPlugin::CommPlugin(LogCallback* pLogCallback)
 CommPlugin::~CommPlugin()
 {
     delete _pPresentationCallbacks;
-    delete _pReelCallbacks;
     delete _pGameCallbacks;
     delete _pClientChannel;
     delete _pClientTransport;

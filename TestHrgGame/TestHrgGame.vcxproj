@@ -62,6 +62,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)Externals\google-protobuf\include;$(SolutionDir)Externals\Aristocrat.GdkRuntime.SnappCpp\include;$(SolutionDir)Externals\Aristocrat.SnappCpp\include;$(ProjectDir)\lib</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -111,12 +112,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CommPlugin.h" />
+    <ClInclude Include="debug.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameCallbacks.h" />
     <ClInclude Include="LogCallback.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PresentationCallbacks.h" />
-    <ClInclude Include="ReelCallbacks.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RuntimePresentationServiceCallback.h" />
     <ClInclude Include="RuntimeServiceCallback.h" />

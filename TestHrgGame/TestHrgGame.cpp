@@ -6,7 +6,7 @@
 #include "shellapi.h"
 #include "framework.h"
 #include "TestHrgGame.h"
-
+#include "debug.h"
 #include "CommPlugin.h"
 #include "TestHrgGameDlg.h"
 #include "LogCallback.h"
@@ -128,14 +128,18 @@ BOOL CTestHrgGameApp::InitInstance()
 	{
 		_hRunOnceMutex = CreateMutexA(0, 0, "GameHostProcess");
 	}
-	LogCallback::SLog(__log_folder, LogInfo, "Args", "Using SNAPP");
+
+	// Uncomment following line if you want process to pause until a debugger is attached.
+	//aristocrat::WaitForDebugger();
+
+    LogCallback::SLog(__log_folder, LogInfo, "Args", "Using SNAPP");
 	auto logger = new LogCallback(DefaultLogLevel, __log_folder);
-	auto pCommPlugin = new CommPlugin(logger);
+	CTestHrgGameDlg dlg(logger);
+	auto pCommPlugin = new CommPlugin(logger, &dlg);
 	pCommPlugin->Start();
 	LogCallback::SLog(__log_folder, LogInfo, "Init", "Started SNAPP host.");
 
 
-	CTestHrgGameDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)

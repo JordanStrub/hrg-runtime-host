@@ -149,7 +149,7 @@ int MemoryCheckedMain(HINSTANCE hInstance, option::Options& opts)
 	LogCallback::SLog(__log_folder, LogInfo, "Args", "Using SNAPP");
 
 	// Uncomment following line if you want process to pause until a debugger is attached.
-	// WaitForDebugger();
+	//WaitForDebugger();
 
 	const char* curDir = SwitchToExecutablesDirectory(hInstance);
 	LogCallback::SLogFormat(__log_folder, LogInfo, "Init", "Executable directory %s", curDir);

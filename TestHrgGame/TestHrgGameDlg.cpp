@@ -6,6 +6,7 @@
 #include "framework.h"
 #include "TestHrgGame.h"
 #include "TestHrgGameDlg.h"
+
 #include "afxdialogex.h"
 
 #ifdef _DEBUG
@@ -50,8 +51,9 @@ END_MESSAGE_MAP()
 
 
 
-CTestHrgGameDlg::CTestHrgGameDlg(CWnd* pParent /*=nullptr*/)
+CTestHrgGameDlg::CTestHrgGameDlg(LogCallback* pLogger, CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_TESTHRGGAME_DIALOG, pParent)
+    , m_pLog(pLogger)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -105,6 +107,9 @@ BOOL CTestHrgGameDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+	m_bInitialized = true;
+	m_pLog->Log(LogDebug, "GameDialog", "initialized=>true");
+	TryUpdateParameterList();
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -189,4 +194,42 @@ void CTestHrgGameDlg::OnBnClickedButtonservice()
 void CTestHrgGameDlg::OnBnClickedButtoncashout()
 {
 	// TODO: Add your control notification handler code here
+}
+
+void CTestHrgGameDlg::UpdateParameters(std::map<std::string, std::string>& parameters)
+{
+	for (auto iter = parameters.begin(); iter != parameters.end(); iter++)
+	{
+		m_mParameters[iter->first] = iter->second;
+	}
+	m_pLog->Log(LogDebug, "GameDialog", "stored parameters from API");
+
+	TryUpdateParameterList();
+}
+
+void CTestHrgGameDlg::TryUpdateParameterList()
+{
+    if (!m_bInitialized)
+    {
+		m_pLog->Log(LogDebug, "GameDialog", "can't yet update parameter list; not yet initialized");
+		return;
+    }
+
+	m_pLog->Log(LogDebug, "GameDialog", "Update parameter list as we're already initialized, starting by clearing the list");
+	char buf1[1000];
+
+    auto pListParams = (CListBox*)GetDlgItem(IDC_LISTPARAMETERS);
+	for (auto i = 0; i < pListParams->GetCount(); i++)
+	{
+		pListParams->DeleteString(0);
+	}
+
+    for (auto iter = m_mParameters.begin(); iter != m_mParameters.end(); iter++)
+	{
+		sprintf(buf1, "%s = %s", iter->first.c_str(), iter->second.c_str());
+		m_pLog->Log(LogDebug, "GameDialog", buf1);
+		CString myString(buf1);
+		LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
+		pListParams->AddString(lpBuffer);
+	}
 }
