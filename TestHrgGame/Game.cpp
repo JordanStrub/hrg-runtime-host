@@ -28,18 +28,13 @@ void Game::UpdateParameters(std::map<std::string, std::string>& parameters)
 void Game::UpdateDenom(long cents)
 {
     _denomCents = cents;
-    auto dollars = cents / 100;
-    cents -= 100 * dollars;
-    char buf[1024];
-    sprintf(buf, "$%ld.%02ld", dollars, cents);
-    _pLog->Log(LogDebug, "denom", buf);
-    std::string str(buf);
+    auto str = CurrencyString(cents);
     CTestHrgGameDlg::Instance()->UpdateDenomMeter(str);
 }
 
-void Game::UpdateBalance(long credits)
+void Game::UpdateBalance(long cents)
 {
-    auto str = CurrencyFromCredits(credits);
+    auto str = CurrencyString(cents);
     CTestHrgGameDlg::Instance()->UpdateCreditMeter(str);
 }
 
@@ -56,9 +51,8 @@ void Game::EndGame()
     CommPlugin::Instance()->Stop();
 }
 
-std::string Game::CurrencyFromCredits(long credits)
+std::string Game::CurrencyString(long cents)
 {
-    auto cents = credits / _denomCents;
     auto dollars = cents / 100;
     cents -= 100 * dollars;
     char buf[1024];
