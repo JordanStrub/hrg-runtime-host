@@ -5,17 +5,17 @@
 #pragma once
 #include <map>
 #include <string>
-#include "LogCallback.h"
 
-class CommPlugin;
+#include "Game.h"
+#include "LogCallback.h"
 
 // CTestHrgGameDlg dialog
 class CTestHrgGameDlg : public CDialogEx
 {
 // Construction
 public:
-	CTestHrgGameDlg(LogCallback* pLogger, CWnd* pParent = nullptr);	// standard constructor
-	void SetCommPlugin(CommPlugin* pCommPlugin) { m_pCommPlugin = pCommPlugin; }
+	CTestHrgGameDlg(LogCallback* pLogger, Game* pGame, CWnd* pParent = nullptr);	// standard constructor
+	static CTestHrgGameDlg* Instance();
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -23,6 +23,9 @@ public:
 #endif
 
 	void UpdateParameters(std::map<std::string, std::string>& parameters);
+	void UpdateDenomMeter(std::string denom);
+	void UpdateCreditMeter(std::string credits);
+	void UpdateWinMeter(std::string win);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
@@ -30,14 +33,11 @@ protected:
 
 // Implementation
 private:
-	void TryUpdateParameterList();
 
 protected:
 	HICON m_hIcon;
 	LogCallback* m_pLog;
-	CommPlugin* m_pCommPlugin;
-	bool m_bInitialized = false;
-	std::map<std::string, std::string> m_mParameters;
+	Game* m_pGame;
 
 	// Generated message map functions
 	virtual BOOL OnInitDialog();

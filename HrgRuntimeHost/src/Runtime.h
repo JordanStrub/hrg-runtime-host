@@ -12,9 +12,7 @@ class Runtime
 
 public:
     Runtime(LogCallback* pLogCallback);
-    bool SetConfigParameter(const char* key, const char* val);
     bool LoadFromModule(const char* psGameModule, const char* psLogFolder);
-    std::map<std::string, std::string>& GetConfigParameters();
     void Shutdown();
     bool IsPendingShutdown();
 };

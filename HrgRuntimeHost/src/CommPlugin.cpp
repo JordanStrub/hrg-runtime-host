@@ -111,16 +111,6 @@ CommPlugin::~CommPlugin()
 
 void CommPlugin::Start()
 {
-    //::Sleep(250);
-    //JoinRequest join;
-    //Empty empty;
-    //Status status;
-    //_pPlatformGameCallbacks->Join(join, empty, status);
-
-    //::Sleep(250);
-    //RuntimeEventNotification notify;
-    //notify.set_runtimeevent(RuntimeEventNotification_RuntimeEvent_RequestConfiguration);
-    //_pPlatformGameCallbacks->RuntimeEvent(notify, empty, status);
 }
 
 void CommPlugin::Stop()

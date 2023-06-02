@@ -2,6 +2,7 @@
 #include "CommPlugin.h"
 #include "Server.h"
 #include "Logger.h"
+#include "Game.h"
 
 using namespace Aristocrat::Snapp;
 
@@ -29,8 +30,13 @@ static void StaticLog(int level, std::string message)
     }
 }
 
-CommPlugin::CommPlugin(LogCallback* pLogCallback, CTestHrgGameDlg* pDialog)
-    : _pDialog(pDialog)
+CommPlugin* CommPlugin::Instance()
+{
+    return commPlugin;
+}
+
+CommPlugin::CommPlugin(LogCallback* pLogCallback, Game* pGame)
+    : _pGame(pGame)
 {
     commPlugin = this;
     pLog = pLogCallback;
@@ -38,7 +44,7 @@ CommPlugin::CommPlugin(LogCallback* pLogCallback, CTestHrgGameDlg* pDialog)
 
     // Server
     _pServiceCallbacks = new ServiceCallbacks();
-    _pRuntimeServiceCallbacks = new RuntimeServiceCallback(pLog, pDialog);
+    _pRuntimeServiceCallbacks = new RuntimeServiceCallback(pLog, pGame);
     _pRuntimePresentationServiceCallbacks = new RuntimePresentationServiceCallback(pLog);
     _pServiceCallbacks->AddCallback(*_pRuntimeServiceCallbacks);
     _pServiceCallbacks->AddCallback(*_pRuntimePresentationServiceCallbacks);
@@ -81,13 +87,13 @@ CommPlugin::~CommPlugin()
 
 void CommPlugin::Start()
 {
-    ::Sleep(250);
+//    ::Sleep(250);
     JoinRequest join;
     Empty empty;
     Status status;
     _pGameCallbacks->Join(join, empty, status);
 
-    ::Sleep(250);
+//    ::Sleep(250);
     RuntimeEventNotification notify;
     notify.set_runtimeevent(RuntimeEventNotification_RuntimeEvent_RequestConfiguration);
     _pGameCallbacks->RuntimeEvent(notify, empty, status);

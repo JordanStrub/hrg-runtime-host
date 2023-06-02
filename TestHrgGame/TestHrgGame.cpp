@@ -134,10 +134,9 @@ BOOL CTestHrgGameApp::InitInstance()
 
     LogCallback::SLog(__log_folder, LogInfo, "Args", "Using SNAPP");
 	auto logger = new LogCallback(DefaultLogLevel, __log_folder);
-	CTestHrgGameDlg dlg(logger);
-	auto pCommPlugin = new CommPlugin(logger, &dlg);
-	dlg.SetCommPlugin(pCommPlugin);
-	pCommPlugin->Start();
+	Game game(logger);
+	CTestHrgGameDlg dlg(logger, &game);
+	CommPlugin commPlugin(logger, &game);
 	LogCallback::SLog(__log_folder, LogInfo, "Init", "Started SNAPP host.");
 
 
@@ -146,8 +145,7 @@ BOOL CTestHrgGameApp::InitInstance()
 	if (nResponse == IDOK)
 	{
 		LogCallback::SLog(__log_folder, LogInfo, "End", "Dialog dismissed with OK.");
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with OK
+		// TODO: Place code here to handle when the dialog is dismissed with OK
 	}
 	else if (nResponse == IDCANCEL)
 	{

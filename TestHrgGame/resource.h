@@ -15,7 +15,6 @@
 #define IDC_LISTPARAMETERS              1007
 #define IDC_BUTTONSERVICE               1008
 #define IDC_BUTTONCASHOUT               1009
-#define IDC_MFCPROPERTYGRID1            1010
 
 // Next default values for new objects
 // 

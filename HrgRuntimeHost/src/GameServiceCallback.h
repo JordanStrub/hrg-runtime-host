@@ -45,29 +45,6 @@ public:
     virtual StatusCode RuntimeEvent(RuntimeEventNotification& request, Empty& response, Status& status)
     {
         _pLog->Log(LogInfo, "GameServiceCallback from game", "Called RuntimeEvent");
-
-        switch (request.runtimeevent())
-        {
-        case RuntimeEventNotification::RequestConfiguration:
-            {
-                _pLog->Log(LogDebug, "...", "RuntimeEventNotification::RequestConfiguration");
-                // Send the Config parameters derived from command line.
-                UpdateParametersRequest parametersRequest;
-                parametersRequest.set_target(GameConfiguration);
-                auto params = _pRuntime->GetConfigParameters();
-                for (const auto& pair : params)
-                {
-                    (*parametersRequest.mutable_parameters())[pair.first] = pair.second;
-                }
-                _pRuntimeCallbacks->UpdateParameters(parametersRequest, response, status);
-                _pLog->Log(LogDebug, "...", "called callbacks->UpdateParameters");
-            }
-            break;
-        default:
-            _pLog->Log(LogDebug, "...", "NOT RuntimeEventNotification::RequestConfiguration");
-            break;
-        }
-
         _pPlatformGameCallbacks->RuntimeEvent(request, response, status);
         return status.status_code();
     }

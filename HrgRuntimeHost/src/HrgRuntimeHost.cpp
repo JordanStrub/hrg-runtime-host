@@ -38,10 +38,10 @@ static char __log_folder[MAX_PATH] = { 0 };
 enum optionIndex {
 	UNKNOWN, 
 	GAMEMODULE,
-	VARIATION,
-	DENOMINATION,
 	LOGPATH,
 	// Below are normal from Monaco but unused here
+	VARIATION,
+	DENOMINATION,
 	DISPLAY0, DISPLAY1, DISPLAY2, DISPLAY3,
 	IPC_PLUGIN,
 	JURISDICTION,
@@ -56,9 +56,9 @@ const option::Descriptor usage[] =
 	{ optionIndex::UNKNOWN,  "", "", option::Arg::None, "USAGE: example [options]\n\n"
 	"Options:" },
 	{ GAMEMODULE,	"g", "game", option::Arg::String /*| option::Arg::Required */, "  --game, -g \tgame module to load." },
-	{ VARIATION,	"v", "variation", option::Arg::String,  "  --variation, -v \tset Game Variation." },
-	{ DENOMINATION, "de", "denomination", option::Arg::Numeric, "--denomination, -de \tdenomination"},
 	{ LOGPATH,		"lg", "log", option::Arg::String,		"  --log, -lg \tset the logging path (relative to game or absolute)." },
+	{ VARIATION,	"v", "variation", option::Arg::String,  "  --variation, -v \tset Game Variation (unused)." },
+	{ DENOMINATION, "de", "denomination", option::Arg::Numeric, "--denomination, -de \tdenomination (unused)."},
 	{ DISPLAY0,		"d0", "display0", option::Arg::Numeric,	"  --display0, -d0 \tset Window Display 0 handle (unused)." },
 	{ DISPLAY1,		"d1", "display1", option::Arg::Numeric, "  --display1, -d1 \tset Window Display 1 handle (unused)." },
 	{ DISPLAY2,		"d2", "display2", option::Arg::Numeric, "  --display2, -d2 \tset Window Display 2 handle (unused)." },
@@ -125,27 +125,6 @@ int MemoryCheckedMain(HINSTANCE hInstance, option::Options& opts)
 		_hRunOnceMutex = CreateMutexA(0, 0, "RuntimeHostProcess");
 	}
 
-	if (opts[VARIATION])
-	{
-		const char* l_gameVariation = opts.GetValue(VARIATION);
-		if (l_gameVariation)
-		{
-			gameVariation = l_gameVariation;
-		}
-		LogCallback::SLogFormat(__log_folder, LogInfo, "Args", "variation %s", gameVariation.c_str());
-	}
-	else
-	{
-		// no default
-		gameVariation = "99";
-	}
-
-	if (opts[DENOMINATION])
-	{
-		opts.GetArgument(DENOMINATION, gameDenomination);
-		LogCallback::SLogFormat(__log_folder, LogInfo, "Args", "Denomination %lu", static_cast<unsigned long>(gameDenomination));
-	}
-
 	LogCallback::SLog(__log_folder, LogInfo, "Args", "Using SNAPP");
 
 	// Uncomment following line if you want process to pause until a debugger is attached.
@@ -173,24 +152,6 @@ int MemoryCheckedMain(HINSTANCE hInstance, option::Options& opts)
 		auto logger = new LogCallback(DefaultLogLevel, __log_folder);
 		auto pRuntime = new Runtime(logger);
 		auto pCommPlugin = new CommPlugin(logger, pRuntime);
-
-		// pass information to GDKRuntime
-		if (!gameVariation.empty())
-		{
-			if (!pRuntime->SetConfigParameter("/Runtime/Variation/SelectedID", gameVariation.c_str()))
-			{
-				LogCallback::SLogFormat(__log_folder, LogInfo, "Args", "Variation ID not accepted %s", gameVariation.c_str());
-			}
-		}
-
-		if (gameDenomination > 0)
-		{
-			char denomStr[MAX_PATH];
-			sprintf(denomStr, "%d", gameDenomination);
-			pRuntime->SetConfigParameter("/Runtime/Denomination", denomStr);
-		}
-
-		LogCallback::SLog(__log_folder, LogInfo, "Init", "Configured Runtime");
 
 		pCommPlugin->Start();
 		LogCallback::SLog(__log_folder, LogInfo, "Init", "Started SNAPP host.");

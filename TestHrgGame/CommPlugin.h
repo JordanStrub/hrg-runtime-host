@@ -8,21 +8,23 @@
 #include "RuntimePresentationServiceCallback.h"
 #include "GameCallbacks.h"
 #include "PresentationCallbacks.h"
-#include "TestHrgGameDlg.h"
+
+class Game;
 
 using namespace Aristocrat::Snapp;
 
 class CommPlugin
 {
 public:
-    CommPlugin(LogCallback* pLogCallback, CTestHrgGameDlg* pDialog);
+    CommPlugin(LogCallback* pLogCallback, Game* pGame);
+    static CommPlugin* Instance();
     ~CommPlugin();
     void Start();
     void Stop();
     void CheckStatus();
 
 private:
-    CTestHrgGameDlg* _pDialog;
+    Game* _pGame;
 
     NamedPipeClientTransport* _pClientTransport;
     Channel* _pClientChannel;

@@ -48,14 +48,21 @@ END_MESSAGE_MAP()
 
 
 // CTestHrgGameDlg dialog
+CTestHrgGameDlg* instance = nullptr;
 
 
-
-CTestHrgGameDlg::CTestHrgGameDlg(LogCallback* pLogger, CWnd* pParent /*=nullptr*/)
+CTestHrgGameDlg::CTestHrgGameDlg(LogCallback* pLogger, Game* pGame, CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_TESTHRGGAME_DIALOG, pParent)
     , m_pLog(pLogger)
+    , m_pGame(pGame)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	instance = this;
+}
+
+CTestHrgGameDlg* CTestHrgGameDlg::Instance()
+{
+	return instance;
 }
 
 void CTestHrgGameDlg::DoDataExchange(CDataExchange* pDX)
@@ -107,9 +114,8 @@ BOOL CTestHrgGameDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-	m_bInitialized = true;
+	m_pGame->StartGame();
 	m_pLog->Log(LogDebug, "GameDialog", "initialized=>true");
-	TryUpdateParameterList();
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -174,7 +180,7 @@ void CTestHrgGameDlg::OnBnClickedOk()
 
 void CTestHrgGameDlg::OnBnClickedCancel()
 {
-	m_pCommPlugin->Stop();
+	m_pGame->EndGame();
 	CDialogEx::OnCancel();
 }
 
@@ -198,25 +204,7 @@ void CTestHrgGameDlg::OnBnClickedButtoncashout()
 
 void CTestHrgGameDlg::UpdateParameters(std::map<std::string, std::string>& parameters)
 {
-	for (auto iter = parameters.begin(); iter != parameters.end(); iter++)
-	{
-		m_mParameters[iter->first] = iter->second;
-	}
-	m_pLog->Log(LogDebug, "GameDialog", "stored parameters from API");
-
-	TryUpdateParameterList();
-}
-
-void CTestHrgGameDlg::TryUpdateParameterList()
-{
-    if (!m_bInitialized)
-    {
-		m_pLog->Log(LogDebug, "GameDialog", "can't yet update parameter list; not yet initialized");
-		return;
-    }
-
-	m_pLog->Log(LogDebug, "GameDialog", "Update parameter list as we're already initialized, starting by clearing the list");
-	char buf1[1000];
+	char buf[1000];
 
     auto pListParams = (CListBox*)GetDlgItem(IDC_LISTPARAMETERS);
 	for (auto i = 0; i < pListParams->GetCount(); i++)
@@ -224,12 +212,36 @@ void CTestHrgGameDlg::TryUpdateParameterList()
 		pListParams->DeleteString(0);
 	}
 
-    for (auto iter = m_mParameters.begin(); iter != m_mParameters.end(); iter++)
+    for (auto iter = parameters.begin(); iter != parameters.end(); ++iter)
 	{
-		sprintf(buf1, "%s = %s", iter->first.c_str(), iter->second.c_str());
-		m_pLog->Log(LogDebug, "GameDialog", buf1);
-		CString myString(buf1);
+		sprintf(buf, "%s = %s", iter->first.c_str(), iter->second.c_str());
+		m_pLog->Log(LogDebug, "GameDialog", buf);
+		CString myString(buf);
 		LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
 		pListParams->AddString(lpBuffer);
 	}
+}
+
+void CTestHrgGameDlg::UpdateDenomMeter(std::string denom)
+{
+	auto pEdit = (CEdit*)GetDlgItem(IDC_DENOM);
+	CString myString(denom.c_str());
+	LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
+	pEdit->SetWindowTextW(lpBuffer);
+}
+
+void CTestHrgGameDlg::UpdateCreditMeter(std::string credit)
+{
+	auto pEdit = (CEdit*)GetDlgItem(IDC_EDIT_CREDITS);
+	CString myString(credit.c_str());
+	LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
+	pEdit->SetWindowTextW(lpBuffer);
+}
+
+void CTestHrgGameDlg::UpdateWinMeter(std::string win)
+{
+	auto pEdit = (CEdit*)GetDlgItem(IDC_EDIT_WIN);
+	CString myString(win.c_str());
+	LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
+	pEdit->SetWindowTextW(lpBuffer);
 }
