@@ -16,5 +16,10 @@ public:
     : _pLog(pLogCallback)
     , _pPlatformPresentationCallbacks(pPresentationCallbacks)
     {}
-    virtual StatusCode RegisterPresentation(RegisterPresentationRequest& request, RegisterPresentationResponse& response, Status& status) { _pLog->Log(LogInfo, "PresentationServiceCallback from game", "Called RegisterPresentation"); return OK; }
+    virtual StatusCode RegisterPresentation(RegisterPresentationRequest& request, RegisterPresentationResponse& response, Status& status)
+    {
+        _pLog->Log(LogInfo, "PresentationServiceCallback from game", "Called RegisterPresentation");
+        _pPlatformPresentationCallbacks->RegisterPresentationOverrides(request, response, status);
+        return status.status_code();
+    }
 };

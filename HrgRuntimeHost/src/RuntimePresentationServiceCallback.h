@@ -16,5 +16,10 @@ public:
     : _pLog(pLogCallback)
     , _pGamesideRuntimePresentationCallbacks(pGamesideRuntimePresentationCallbacks)
     {}
-    virtual StatusCode PresentOverriddenPresentation(OverriddenPresentationMessage& request, OverriddenPresentationResponse& response, Status& status) { _pLog->Log(LogInfo, "RuntimePresentationServiceCallback", "Called PresentOverriddenPresentation"); return OK; }
+    virtual StatusCode PresentOverriddenPresentation(OverriddenPresentationMessage& request, OverriddenPresentationResponse& response, Status& status)
+    {
+        _pLog->Log(LogInfo, "RuntimePresentationServiceCallback", "Called PresentOverriddenPresentation");
+        _pGamesideRuntimePresentationCallbacks->PresentOverriddenPresentation(request, response, status);
+        return status.status_code();
+    }
 };
