@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include <vector>
 #include <map>
 #include <string>
 
@@ -24,8 +25,11 @@ public:
 
 	void UpdateParameters(std::map<std::string, std::string>& parameters);
 	void UpdateDenomMeter(std::string denom);
-	void UpdateCreditMeter(std::string credits);
-	void UpdateWinMeter(std::string win);
+	void UpdateCreditMeter(std::string currency, std::string credits);
+	void UpdateWinMeter(std::string currency, std::string credits);
+	void UpdatePlatformMessage(std::vector<std::string> messages);
+	void UpdateBetChoices(std::vector<std::string> betCredits);
+	void UpdateStatusLine(std::string status);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
@@ -38,6 +42,7 @@ protected:
 	HICON m_hIcon;
 	LogCallback* m_pLog;
 	Game* m_pGame;
+    int m_currentBetIndex;
 
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
@@ -51,4 +56,7 @@ public:
 	afx_msg void OnCbnSelchangeComboBet();
 	afx_msg void OnBnClickedButtonservice();
 	afx_msg void OnBnClickedButtoncashout();
+	afx_msg void OnBnClickedButtonplay();
+private:
+	void PlayMessageBeepAndWait(unsigned beepType, unsigned delayMs);
 };

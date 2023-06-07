@@ -11,18 +11,22 @@
 #define IDC_COMBO_BET                   1001
 #define IDC_EDIT_CREDITS                1002
 #define IDC_DENOM                       1003
-#define IDC_STATUS                      1004
+#define IDC_EDIT_WIN2                   1005
+#define IDC_EDIT_STATUS                 1006
 #define IDC_LISTPARAMETERS              1007
 #define IDC_BUTTONSERVICE               1008
 #define IDC_BUTTONCASHOUT               1009
+#define IDC_EDIT_CREDITS2               1010
+#define IDC_LISTPLATMSGS                1011
+#define IDC_BUTTONPLAY                  1013
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        130
+#define _APS_NEXT_RESOURCE_VALUE        131
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1013
+#define _APS_NEXT_CONTROL_VALUE         1014
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

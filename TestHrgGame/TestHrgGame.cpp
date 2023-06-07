@@ -150,8 +150,7 @@ BOOL CTestHrgGameApp::InitInstance()
 	else if (nResponse == IDCANCEL)
 	{
 		LogCallback::SLog(__log_folder, LogInfo, "End", "Dialog dismissed with Cancel.");
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with Cancel
+		// TODO: Place code here to handle when the dialog is dismissed with Cancel
 	}
 	else if (nResponse == -1)
 	{

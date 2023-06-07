@@ -11,8 +11,6 @@
 
 class Game;
 
-using namespace Aristocrat::Snapp;
-
 class CommPlugin
 {
 public:
@@ -22,6 +20,14 @@ public:
     void Start();
     void Stop();
     void CheckStatus();
+    void UpdateBet(uint64_t bet, uint64_t denom);
+    void GameReady();
+    void GameRoundEvent(GameRoundEventType type, GameRoundEventStage stage, GameRoundPlayMode mode, uint64_t bet = 0, uint64_t win = 0);
+    void RuntimeEvent(RuntimeEventNotification_RuntimeEvent evt);
+    void RuntimeFlag(RuntimeFlag flag, bool value);
+    void PlayGame(uint64_t bet, uint64_t denom);
+    void EndGame(uint64_t win);
+    uint32_t GetRandom(uint32_t range);
 
 private:
     Game* _pGame;

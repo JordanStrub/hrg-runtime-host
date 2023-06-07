@@ -44,12 +44,28 @@ public:
         _pGame->UpdateBalance(request.value());
         return OK;
     }
-    virtual StatusCode UpdatePlatformMessage(UpdatePlatformMessageRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdatePlatformMessage"); return OK; }
+    virtual StatusCode UpdatePlatformMessage(UpdatePlatformMessageRequest& request, Empty& response, Status& status)
+    {
+        _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdatePlatformMessage");
+        auto list = request.messages();
+        std::vector<std::string> vector;
+        for (auto message : list)
+        {
+            vector.push_back(message);
+        }
+        _pGame->UpdatePlatformMessage(vector);
+        return OK;
+    }
     virtual StatusCode UpdateVolume(VolumeUpdateNotification& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateVolume"); return OK; }
     virtual StatusCode UpdateTimeRemaining(UpdateTimeRemainingRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called UpdateTimeRemaining"); return OK; }
     virtual StatusCode UpdateHandCount(UpdateHandCountNotification& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback", "UpdateHandCount"); return OK; }
     virtual StatusCode InvokeButton(InvokeButtonRequest& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called InvokeButton"); return OK; }
-    virtual StatusCode BeginGameRoundResult(BeginGameRoundNotification& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called BeginGameRoundResult"); return OK; }
+    virtual StatusCode BeginGameRoundResult(BeginGameRoundNotification& request, Empty& response, Status& status)
+    {
+        _pLog->Log(LogInfo, "RuntimeServiceCallback","Called BeginGameRoundResult");
+        _pGame->HandlePlayGameResponse();
+        return OK;
+    }
     virtual StatusCode OnJackpotUpdated(Empty& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called OnJackpotUpdated"); return OK; }
     virtual StatusCode JackpotWinAvailable(JackpotWinAvailableNotification& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called JackpotWinAvailable"); return OK; }
     virtual StatusCode Shutdown(Empty& request, Empty& response, Status& status) { _pLog->Log(LogInfo, "RuntimeServiceCallback","Called Shutdown"); return OK; }

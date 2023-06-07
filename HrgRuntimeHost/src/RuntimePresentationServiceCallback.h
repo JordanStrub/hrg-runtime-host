@@ -18,7 +18,7 @@ public:
     {}
     virtual StatusCode PresentOverriddenPresentation(OverriddenPresentationMessage& request, OverriddenPresentationResponse& response, Status& status)
     {
-        _pLog->Log(LogInfo, "RuntimePresentationServiceCallback", "Called PresentOverriddenPresentation");
+        _pLog->Log(LogInfo, "RuntimePresentationServiceCallback from platform", "Called PresentOverriddenPresentation");
         _pGamesideRuntimePresentationCallbacks->PresentOverriddenPresentation(request, response, status);
         return status.status_code();
     }

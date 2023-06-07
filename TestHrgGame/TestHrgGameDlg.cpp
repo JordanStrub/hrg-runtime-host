@@ -9,10 +9,6 @@
 #include "CommPlugin.h"
 #include "afxdialogex.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
 
 // CAboutDlg dialog used for App About
 
@@ -79,6 +75,7 @@ BEGIN_MESSAGE_MAP(CTestHrgGameDlg, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO_BET, &CTestHrgGameDlg::OnCbnSelchangeComboBet)
 	ON_BN_CLICKED(IDC_BUTTONSERVICE, &CTestHrgGameDlg::OnBnClickedButtonservice)
 	ON_BN_CLICKED(IDC_BUTTONCASHOUT, &CTestHrgGameDlg::OnBnClickedButtoncashout)
+	ON_BN_CLICKED(IDC_BUTTONPLAY, &CTestHrgGameDlg::OnBnClickedButtonplay)
 END_MESSAGE_MAP()
 
 
@@ -114,7 +111,7 @@ BOOL CTestHrgGameDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-	m_pGame->StartGame();
+	m_pGame->Start();
 	m_pLog->Log(LogDebug, "GameDialog", "initialized=>true");
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -180,16 +177,60 @@ void CTestHrgGameDlg::OnBnClickedOk()
 
 void CTestHrgGameDlg::OnBnClickedCancel()
 {
-	m_pGame->EndGame();
+	m_pGame->Stop();
 	CDialogEx::OnCancel();
 }
 
 
 void CTestHrgGameDlg::OnCbnSelchangeComboBet()
 {
-	// TODO: Add your control notification handler code here
+	auto pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_BET);
+	auto sel = pCombo->GetCurSel();
+	CString result;
+	pCombo->GetLBText(sel, result);
+	std::wstring betStrw(result);
+	std::string betStr;
+	betStr.assign(betStrw.begin(), betStrw.end());
+	m_pLog->Log(LogDebug, "betComboSelection", betStr.c_str());
+	if (m_pGame->TrySetBet(betStr))
+	{
+		m_currentBetIndex = sel;
+	}
+	else
+	{
+		pCombo->SetCurSel(m_currentBetIndex);
+		PlayMessageBeepAndWait(MB_ICONWARNING, 250);
+	}
 }
 
+void CTestHrgGameDlg::OnBnClickedButtonplay()
+{
+	m_pGame->PlayGame();
+
+	UpdateStatusLine("Game playing ...");
+
+	// simulate game with variety of consecutive noises
+	PlayMessageBeepAndWait(MB_ICONQUESTION, 250);
+	PlayMessageBeepAndWait(MB_ICONHAND, 250);
+	PlayMessageBeepAndWait(MB_OK, 1000);
+	PlayMessageBeepAndWait(MB_ICONQUESTION, 250);
+	PlayMessageBeepAndWait(MB_ICONHAND, 250);
+	PlayMessageBeepAndWait(MB_OK, 1000);
+
+	m_pGame->EndGame();
+
+	UpdateStatusLine("Present wins");
+
+	// presentation
+	PlayMessageBeepAndWait(MB_ICONHAND, 250);
+	PlayMessageBeepAndWait(MB_OK, 1000);
+
+	UpdateStatusLine("Game over");
+
+	m_pGame->Idle();
+
+	UpdateStatusLine("Game over");
+}
 
 void CTestHrgGameDlg::OnBnClickedButtonservice()
 {
@@ -212,9 +253,9 @@ void CTestHrgGameDlg::UpdateParameters(std::map<std::string, std::string>& param
 		pListParams->DeleteString(0);
 	}
 
-    for (auto iter = parameters.begin(); iter != parameters.end(); ++iter)
+    for (auto parameter : parameters)
 	{
-		sprintf(buf, "%s = %s", iter->first.c_str(), iter->second.c_str());
+		sprintf(buf, "%s = %s", parameter.first.c_str(), parameter.second.c_str());
 		m_pLog->Log(LogDebug, "GameDialog", buf);
 		CString myString(buf);
 		LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
@@ -230,18 +271,74 @@ void CTestHrgGameDlg::UpdateDenomMeter(std::string denom)
 	pEdit->SetWindowTextW(lpBuffer);
 }
 
-void CTestHrgGameDlg::UpdateCreditMeter(std::string credit)
+void CTestHrgGameDlg::UpdateCreditMeter(std::string currency, std::string credits)
 {
 	auto pEdit = (CEdit*)GetDlgItem(IDC_EDIT_CREDITS);
-	CString myString(credit.c_str());
+	CString myString(currency.c_str());
 	LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
+	pEdit->SetWindowTextW(lpBuffer);
+
+    pEdit = (CEdit*)GetDlgItem(IDC_EDIT_CREDITS2);
+	myString = credits.c_str();
+	lpBuffer = myString.GetBuffer(myString.GetLength());
 	pEdit->SetWindowTextW(lpBuffer);
 }
 
-void CTestHrgGameDlg::UpdateWinMeter(std::string win)
+void CTestHrgGameDlg::UpdateWinMeter(std::string currency, std::string credits)
 {
 	auto pEdit = (CEdit*)GetDlgItem(IDC_EDIT_WIN);
-	CString myString(win.c_str());
+	CString myString(currency.c_str());
 	LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
 	pEdit->SetWindowTextW(lpBuffer);
+
+	pEdit = (CEdit*)GetDlgItem(IDC_EDIT_WIN2);
+	myString = credits.c_str();
+	lpBuffer = myString.GetBuffer(myString.GetLength());
+	pEdit->SetWindowTextW(lpBuffer);
+}
+
+void CTestHrgGameDlg::UpdatePlatformMessage(std::vector<std::string> messages)
+{
+	auto pList = (CListBox*)GetDlgItem(IDC_LISTPLATMSGS);
+	for (auto i = 0; i < pList->GetCount(); i++)
+	{
+		pList->DeleteString(0);
+	}
+
+	for (auto message : messages)
+	{
+		m_pLog->Log(LogDebug, "GameDialog", message.c_str());
+		CString myString(message.c_str());
+		LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
+		pList->AddString(lpBuffer);
+	}
+}
+
+void CTestHrgGameDlg::UpdateBetChoices(std::vector<std::string> betCredits)
+{
+	auto pCombo = (CComboBox*)GetDlgItem(IDC_COMBO_BET);
+	pCombo->Clear();
+	for (auto betCredit : betCredits)
+	{
+		CString myString(betCredit.c_str());
+		LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
+		pCombo->AddString(lpBuffer);
+	}
+
+	m_currentBetIndex = 0;
+	pCombo->SetCurSel(0);
+}
+
+void CTestHrgGameDlg::UpdateStatusLine(std::string status)
+{
+	auto pLine = (CEdit*)GetDlgItem(IDC_EDIT_STATUS);
+	CString myString(status.c_str());
+	LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
+	pLine->SetWindowTextW(lpBuffer);
+}
+
+void CTestHrgGameDlg::PlayMessageBeepAndWait(unsigned beepType, unsigned delayMs)
+{
+	MessageBeep(beepType);
+	Sleep(delayMs);
 }
