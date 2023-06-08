@@ -25,8 +25,8 @@ public:
 
 	void UpdateParameters(std::map<std::string, std::string>& parameters);
 	void UpdateDenomMeter(std::string denom);
-	void UpdateCreditMeter(std::string currency, std::string credits);
-	void UpdateWinMeter(std::string currency, std::string credits);
+	void UpdateCreditMeter(std::string credit);
+	void UpdateWinMeter(std::string win);
 	void UpdatePlatformMessage(std::vector<std::string> messages);
 	void UpdateBetChoices(std::vector<std::string> betCredits);
 	void UpdateStatusLine(std::string status);

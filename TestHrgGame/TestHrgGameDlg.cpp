@@ -271,29 +271,19 @@ void CTestHrgGameDlg::UpdateDenomMeter(std::string denom)
 	pEdit->SetWindowTextW(lpBuffer);
 }
 
-void CTestHrgGameDlg::UpdateCreditMeter(std::string currency, std::string credits)
+void CTestHrgGameDlg::UpdateCreditMeter(std::string credit)
 {
 	auto pEdit = (CEdit*)GetDlgItem(IDC_EDIT_CREDITS);
-	CString myString(currency.c_str());
+	CString myString(credit.c_str());
 	LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
-	pEdit->SetWindowTextW(lpBuffer);
-
-    pEdit = (CEdit*)GetDlgItem(IDC_EDIT_CREDITS2);
-	myString = credits.c_str();
-	lpBuffer = myString.GetBuffer(myString.GetLength());
 	pEdit->SetWindowTextW(lpBuffer);
 }
 
-void CTestHrgGameDlg::UpdateWinMeter(std::string currency, std::string credits)
+void CTestHrgGameDlg::UpdateWinMeter(std::string win)
 {
 	auto pEdit = (CEdit*)GetDlgItem(IDC_EDIT_WIN);
-	CString myString(currency.c_str());
+	CString myString(win.c_str());
 	LPTSTR lpBuffer = myString.GetBuffer(myString.GetLength());
-	pEdit->SetWindowTextW(lpBuffer);
-
-	pEdit = (CEdit*)GetDlgItem(IDC_EDIT_WIN2);
-	myString = credits.c_str();
-	lpBuffer = myString.GetBuffer(myString.GetLength());
 	pEdit->SetWindowTextW(lpBuffer);
 }
 

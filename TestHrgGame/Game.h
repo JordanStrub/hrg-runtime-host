@@ -31,7 +31,7 @@ public:
 
 private:
     std::string CurrencyString(uint64_t cents);
-    std::string CreditsString(uint64_t cents);
+    std::string CurrencyAndCreditsString(uint64_t cents);
 
     std::thread _thread; // < Thread to start on.
     LogCallback* _pLog;

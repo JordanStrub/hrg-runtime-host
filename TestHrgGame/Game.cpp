@@ -44,7 +44,7 @@ void Game::UpdateBalance(uint64_t cents)
 {
     _pLog->Log(LogDebug, "Game", "UpdateBalance");
     _bankCents = cents;
-    CTestHrgGameDlg::Instance()->UpdateCreditMeter(CurrencyString(cents), CreditsString(cents));
+    CTestHrgGameDlg::Instance()->UpdateCreditMeter(CurrencyAndCreditsString(cents));
     _pLog->Log(LogDebug, "Game", "UpdateBalance complete");
 }
 
@@ -52,7 +52,7 @@ void Game::UpdateWin(uint64_t cents)
 {
     _pLog->Log(LogDebug, "Game", "UpdateWin");
     _winCents = cents;
-    CTestHrgGameDlg::Instance()->UpdateWinMeter(CurrencyString(cents), CreditsString(cents));
+    CTestHrgGameDlg::Instance()->UpdateWinMeter(CurrencyAndCreditsString(cents));
     _pLog->Log(LogDebug, "Game", "UpdateWin Complete");
 }
 
@@ -72,7 +72,7 @@ void Game::Start()
     for (auto bet = 1; bet <= 5; bet++)
     {
         auto betCents = _denomCents * bet;
-        options.push_back(CreditsString(betCents));
+        options.push_back(CurrencyAndCreditsString(betCents));
     }
     CTestHrgGameDlg::Instance()->UpdateBetChoices(options);
 
@@ -105,13 +105,14 @@ void Game::Idle()
 bool Game::TrySetBet(std::string betCredits)
 {
     _pLog->Log(LogDebug, "Game", "TrySetBet");
-    auto blankPos = betCredits.find_first_of(" ");
-    if (blankPos >= 0)
+    auto parenPos = betCredits.find_first_of("(") + 1;
+    auto blankPos = betCredits.find_last_of(" ");
+    if (parenPos * blankPos == 0)
     {
-        betCredits[blankPos] = '\0';
+        return false;
     }
 
-    auto betCents = std::stol(betCredits) * _denomCents;
+    auto betCents = std::stol(betCredits.substr(parenPos, blankPos - parenPos)) * _denomCents;
     if (betCents > _bankCents)
     {
         // Can't afford this bet
@@ -175,7 +176,7 @@ void Game::EndGame()
 
     GameRoundEvent(Present, Invoked);
 
-    CTestHrgGameDlg::Instance()->UpdateWinMeter(CurrencyString(_winCents), CreditsString(_winCents));
+    CTestHrgGameDlg::Instance()->UpdateWinMeter(CurrencyAndCreditsString(_winCents));
     _pLog->Log(LogDebug, "Game", "EndGame complete");
 }
 
@@ -207,11 +208,13 @@ std::string Game::CurrencyString(uint64_t cents)
     return std::string(buf);
 }
 
-std::string Game::CreditsString(uint64_t cents)
+std::string Game::CurrencyAndCreditsString(uint64_t cents)
 {
-    auto credits = _denomCents == 0 ? 0 : cents / _denomCents;
+    auto credits = cents / _denomCents;
+    auto dollars = cents / 100;
+    cents -= 100 * dollars;
     char buf[1024];
-    sprintf(buf, "%llu cr", credits);
-    _pLog->Log(LogDebug, "credits", buf);
+    sprintf(buf, "$%llu.%02llu (%llu cr)", dollars, cents, credits);
+    _pLog->Log(LogDebug, "currency+credits", buf);
     return std::string(buf);
 }
